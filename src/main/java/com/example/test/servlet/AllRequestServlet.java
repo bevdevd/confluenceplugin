@@ -155,9 +155,6 @@ public class AllRequestServlet implements Filter{
         this.config = config;
     }
 
-    // private Page getPage(String uri, String confluencePageId){
-        
-    // }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException{
@@ -174,13 +171,7 @@ public class AllRequestServlet implements Filter{
         try {
             UserProfile user = this.userManager.getRemoteUser(httpRequest);
             ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
-            // if (loggedInUser != null) {
-            //     System.out.println("_________________________________________________________________________________");
-            //     System.out.println("logged in user is: " + loggedInUser);
-
-            // } else {
-            //     System.out.println("cant find logged in user");
-            // }
+            
             Map<String,String[]> paramMap =  request.getParameterMap();
             for (Map.Entry<String,String[]> entry : paramMap.entrySet()) {
 
@@ -190,15 +181,10 @@ public class AllRequestServlet implements Filter{
 
             String confluencePageId = request.getParameter("pageId");   
             String confluenceSpaceId = request.getParameter("spaceId");    
-            String confluenceSpaceKey = request.getParameter("spaceKey");      
-            if (confluenceSpaceId != null) {
-                // contentService.find()
-                //     .withSpace(confluenceSpaceId)
-                //     .fetch
-            }
+            String confluenceSpaceKey = request.getParameter("spaceKey");
+            
             boolean isPage = false;
             boolean isSpace = false;
-            //String confluencePageId = "";
             String spaceKey = "";
             String pageKey = "";
             Page page = null;
@@ -206,7 +192,14 @@ public class AllRequestServlet implements Filter{
             // Page foundPage = getPage(uri, confluencePageId);
             // Check whether its a page or a space
             System.out.println("====================checking for page or a space==========================");
-            String pathInfo = uri.split("/confluence")[1];
+            String[] uriSplit = uri.split("/confluence", 1);
+            String pathInfo;
+            if (uriSplit.length > 1) {
+                pathInfo = uriSplit[1];
+            } else {
+                pathInfo = uriSplit[0];
+            }
+
             System.out.println("pathInfo  :  " + pathInfo);
             System.out.println("confluencePageId  :  " + confluencePageId);
             if (pathInfo != null ) {
@@ -275,25 +268,7 @@ public class AllRequestServlet implements Filter{
                       
                 System.out.println(permissionList + "=" + Arrays.toString(permissionList.toArray()));
                 ContentId pageId = page.getContentId();
-                //ContentId spaceId = ContentId.of(confluenceSpaceKey);
-                // Using the content service as its the preferred way over using pagemanager.
-                // Space rootSpace = spaceService.find()
-                //     .withId(pageId)
-                //     .fetch(new Expansion("space"))
-                //     .get()
-                //     .getSpace();
-                // Content page = contentService.find()
-                //     .withId(pageId)
-                //     .fetch()
-                //     .get();
-                // System.out.println("THE PAGE IS: " + page.toString());
-                // Extract the space key from the collapsed reference
-                // String spaceKey = page.getSpace().getIdProperties().get("key");
-                // System.out.println("THE spacekey IS: " + spaceKey);
-
-                // // Fetch the complete space object using the space key
-                // SpaceFinder spaceFinder = spaceService.find().withProperty("key", spaceKey);
-                // Space space = spaceFinder.fetch().get();
+                
                     System.out.println("THE SPACE key IS: " + confluenceSpaceKey);
                 Space rootSpace = spaceManager.getSpace(confluenceSpaceKey);
                 if (rootSpace != null) {
@@ -310,18 +285,6 @@ public class AllRequestServlet implements Filter{
                     System.out.println("no root SPACE found :(");
                 }
 
-
-                // Space rootSpace;
-                // if (page.getSpace() == null) {
-                //     // Fetch space separately
-                //     rootSpace = spaceService.find().withKey(confluenceSpaceKey).fetch().get();
-                // }
-            
-                // else {
-                //     rootSpace = page.getSpace();
-                // }
-                // System.out.println("THE ROOT SPACE IS: " + rootSpace.getName());
-                
                 List<Page> ancestors = page.getAncestors();
                 System.out.println("ancestors: ");
                 System.out.println(Arrays.toString(ancestors.toArray()));
@@ -354,11 +317,6 @@ public class AllRequestServlet implements Filter{
                 } else {
                     System.out.println("space is not restricted");
                 }
-                // System.out.println("================================");
-                // System.out.println("View groups are :: " + viewGroups);
-                // System.out.println("USER ==== " + loggedInUser.getName());
-                // Boolean isVisible = permissionManager.hasPermission(AuthenticatedUserThreadLocal.get(), Permission.VIEW, page);
-                // System.out.println("visible" + isVisible);
             }
             System.out.println("CHECKING REST CALLS NOW");
             if (uri.startsWith("/confluence/pages/viewpage.action")) {
@@ -805,6 +763,8 @@ public class AllRequestServlet implements Filter{
         } catch (Exception e) {
             System.out.println("unfortunately, we have errored: " + e);
             //e.printStackTrace();
+            //continue as per normal if the servlet filter fails
+            chain.doFilter(request, response);
 
         }
     }
@@ -923,52 +883,14 @@ public class AllRequestServlet implements Filter{
 
         for (SpacePermission permission : spacePermissions) {
 
-            // System.out.println("space permission:  " + permission.toString());
-            // System.out.println("space permission type:  " + permission.getType());
-            // System.out.println("space permission group:  " + permission.getGroup());
-            // System.out.println("is group permission:  " + permission.isGroupPermission());
             if (permission.isGroupPermission() && permission.getType().equals("VIEWSPACE")) {
                 String group = permission.getGroup();
                 if (restrictedGroups.contains(group)) {
                     spaceRestrictedGroups.add(group);
-
-                    // System.out.println(" group in restricted groups:  " + group);
                 }
-                // System.out.println(" group not in restricted groups:  " + group);
             }
         }
-        // for (String group : restrictedGroups) {
-        //     if (spacePermissionManager.groupHasPermission(ContentPermission.VIEW_PERMISSION, space, group)) {
-        //         spaceRestrictedGroups.add(group);        
-        //         System.out.println("space has restricted group:  " + group);
-        //     }
-        //     System.out.println("space does not have restricted group:  " + group); 
-        // }
-        List<String> userGroups = this.userAccessor.getGroupNamesForUserName(user.getName());        
-        // System.out.println("space restricted groups:  " + Arrays.toString(spaceRestrictedGroups.toArray()));
-
-        // System.out.println("user groups:  " + Arrays.toString(userGroups.toArray()));
-
-        // Filter permissions to get only view permissions
-        // List<SpacePermission> viewPermissions = permissions.stream()
-        //         .filter(permission -> SpacePermission.VIEWSPACE_PERMISSION.equals(permission.getType()))
-        //         .toList();
-        // //List<ContentPermissionSet> permissionList = contentPermissionManager.getContentPermissionSets(space, ContentPermission.VIEW_PERMISSION);
-        // System.out.println("there are " + viewPermissions.size() + " sets of permissions here");
-        // for (SpacePermission permission : viewPermissions) {
-        //     System.out.println(permission.toString());
-        // }
-        // List<String> userGroups = this.userAccessor.getGroupNamesForUserName(user.getName());
-
-        // List<String> viewGroups = new ArrayList<String>();
-        // // Only group permissions are relevant here
-        // for (ContentPermissionSet set : permissionList) {
-        //     for (ContentPermission permission : set) {
-        //         if (permission.isGroupPermission()) {
-        //             viewGroups.add(permission.getGroupName());
-        //         }
-        //     }
-        // }
+        List<String> userGroups = this.userAccessor.getGroupNamesForUserName(user.getName());
 
         for (String group : spaceRestrictedGroups) {
             if (!userGroups.contains(group)) {
