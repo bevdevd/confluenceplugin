@@ -242,19 +242,7 @@ public class AllRequestServlet implements Filter{
                     isSpace = true;
                 }
             }
-            
-            // if (fail) {
-            //     fail = false;
-            //     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
-            //     return;
-            // }
-            // if (foundPage != null) {
-            //     System.out.println("_________________________________________________________________________________");
-            //     System.out.println("found page is: " + foundPage);
-
-            // } else {
-            //     System.out.println("cant find page " + confluencePageId);
-            // }
+        
             if (isPage && loggedInUser != null && page != null) {
                 System.out.println("_________________________________________________________________________________");
                 System.out.println(String.format("Current Date/Time : %tc", new Date()));
