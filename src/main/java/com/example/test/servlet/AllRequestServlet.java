@@ -192,7 +192,7 @@ public class AllRequestServlet implements Filter{
             // Page foundPage = getPage(uri, confluencePageId);
             // Check whether its a page or a space
             System.out.println("====================checking for page or a space==========================");
-            String[] uriSplit = uri.split("/confluence", 1);
+            String[] uriSplit = uri.split("/confluence", 2);
             String pathInfo;
             if (uriSplit.length > 1) {
                 pathInfo = uriSplit[1];
@@ -898,7 +898,7 @@ public class AllRequestServlet implements Filter{
                 return true;
             }
         }
-        System.out.println("user can be able to see this  SPACE");
+        System.out.println("user can see this SPACE");
         return false;
     }
 }
