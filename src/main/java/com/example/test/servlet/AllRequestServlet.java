@@ -54,6 +54,8 @@ import com.atlassian.confluence.spaces.SpaceManager;
 import com.atlassian.confluence.spaces.Space;
 import com.atlassian.confluence.security.SpacePermission;
 import com.atlassian.confluence.security.SpacePermissionManager;
+import com.atlassian.confluence.pages.Attachment;
+import com.atlassian.confluence.pages.AttachmentManager;
 
 import com.atlassian.sal.api.user.UserProfile;
 import com.atlassian.confluence.core.ContentPermissionManager;
@@ -119,6 +121,8 @@ public class AllRequestServlet implements Filter{
     private final PageManager pageManager;
     @ComponentImport
     private final SpaceManager spaceManager;
+    @ComponentImport
+    private final AttachmentManager attachmentManager;
 
     private boolean fail = false;
 
@@ -133,6 +137,7 @@ public class AllRequestServlet implements Filter{
         PermissionManager permissionManager,
         PageManager pageManager,
         SpaceManager spaceManager,
+        AttachmentManager attachmentManager,
         ContentPermissionManager contentPermissionManager,
         SpacePermissionManager spacePermissionManager,
         ContentService contentService,
@@ -144,6 +149,7 @@ public class AllRequestServlet implements Filter{
             this.permissionManager = permissionManager;
             this.spaceManager = spaceManager;
             this.pageManager = pageManager;
+            this.attachmentManager = attachmentManager;
             this.contentPermissionManager = contentPermissionManager;
             this.spacePermissionManager = spacePermissionManager;
             this.contentService = contentService;
@@ -192,14 +198,13 @@ public class AllRequestServlet implements Filter{
             // Page foundPage = getPage(uri, confluencePageId);
             // Check whether its a page or a space
             System.out.println("====================checking for page or a space==========================");
-            String[] uriSplit = uri.split("/confluence", 1);
-            String pathInfo;
-            if (uriSplit.length > 1) {
+            String pathInfo = uri;
+            if (uri.startsWith("/confluence")) {
+                String[] uriSplit = uri.split("/confluence", 2);
+                
                 pathInfo = uriSplit[1];
-            } else {
-                pathInfo = uriSplit[0];
+                
             }
-
             System.out.println("pathInfo  :  " + pathInfo);
             System.out.println("confluencePageId  :  " + confluencePageId);
             if (pathInfo != null ) {
@@ -242,7 +247,20 @@ public class AllRequestServlet implements Filter{
                     isSpace = true;
                 }
             }
-        
+            
+            
+            // if (fail) {
+            //     fail = false;
+            //     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
+            //     return;
+            // }
+            // if (foundPage != null) {
+            //     System.out.println("_________________________________________________________________________________");
+            //     System.out.println("found page is: " + foundPage);
+
+            // } else {
+            //     System.out.println("cant find page " + confluencePageId);
+            // }
             if (isPage && loggedInUser != null && page != null) {
                 System.out.println("_________________________________________________________________________________");
                 System.out.println(String.format("Current Date/Time : %tc", new Date()));
@@ -257,37 +275,21 @@ public class AllRequestServlet implements Filter{
                 System.out.println(permissionList + "=" + Arrays.toString(permissionList.toArray()));
                 ContentId pageId = page.getContentId();
                 
-                    System.out.println("THE SPACE key IS: " + confluenceSpaceKey);
-                Space rootSpace = spaceManager.getSpace(confluenceSpaceKey);
-                if (rootSpace != null) {
-                    System.out.println("THE SPACE IS: " + rootSpace.getName());
-                    if (isRestrictedSpace(loggedInUser, rootSpace, restrictedGroups)) {
-                        ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
-                        System.out.println(rootSpace.getName() + " space is  restricted");
-                        return;
-                    } else {
-                        System.out.println("space is not restricted");
-                    }
+                    // System.out.println("THE SPACE key IS: " + confluenceSpaceKey);
+                // Space rootSpace = spaceManager.getSpace(confluenceSpaceKey);
+                // if (rootSpace != null) {
+                //     System.out.println("THE SPACE IS: " + rootSpace.getName());
+                //     if (isRestrictedSpace(loggedInUser, rootSpace, restrictedGroups)) {
+                //         ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
+                //         System.out.println(rootSpace.getName() + " space is  restricted");
+                //         return;
+                //     } else {
+                //         System.out.println("space is not restricted");
+                //     }
 
-                } else {
-                    System.out.println("no root SPACE found :(");
-                }
-
-                List<Page> ancestors = page.getAncestors();
-                System.out.println("ancestors: ");
-                System.out.println(Arrays.toString(ancestors.toArray()));
-
-                
-                // Don't display the child if the user doesnt have permissions to view the parent
-                for (Page ancestor : ancestors) {
-                    if (isRestrictedPage(loggedInUser, ancestor, restrictedGroups)) {
-                        ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
-                        return;
-                    } else {
-                        System.out.println("ancestor is not restricted");
-                    }
-                }
-
+                // } else {
+                //     System.out.println("no root SPACE found :(");
+                // }
                 
                 if (isRestrictedPage(loggedInUser, page, restrictedGroups)) {
                     ((HttpServletResponse) response).sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -337,7 +339,7 @@ public class AllRequestServlet implements Filter{
             }
             else if (uri.startsWith("/confluence/rest/dashboardmacros/1.0/updates")) {
                 System.out.println("=======================================================");
-                System.out.println("is a macro  call");
+                System.out.println("fetching latest updates");
                 ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(httpResponse);
                 String modifiedResponseContent;
                 PrintWriter writer = responseWrapper.getWriter();
@@ -370,14 +372,40 @@ public class AllRequestServlet implements Filter{
                             JsonArray modifiedUpdateArray = new JsonArray();
                             for (JsonElement recentUpdate : recentUpdatesArray) {
                                 JsonObject recentUpdateObject = recentUpdate.getAsJsonObject();
-                                if (recentUpdateObject.has("id")) {
-                                    int id = recentUpdateObject.getAsJsonPrimitive("id").getAsInt();
-                                    System.out.println("id is " + id);
-                                    if (!isRestrictedPage(loggedInUser, id, restrictedGroups)) {
-                                        hasValidUpdates = true;
-                                        modifiedUpdateArray.add(recentUpdateObject);
+                                String type = recentUpdateObject.getAsJsonPrimitive("contentType").getAsString();
+
+                                System.out.println("type is " + type);
+                                // check permissions on the page results
+                                if (type.equals("page")) {
+                                    if (recentUpdateObject.has("id")) {
+                                        int id = recentUpdateObject.getAsJsonPrimitive("id").getAsInt();
+                                        System.out.println("id is " + id);
+                                        if (!isRestrictedPage(loggedInUser, id, restrictedGroups)) {
+                                            hasValidUpdates = true;
+                                            System.out.println("page is not restricted");
+                                            modifiedUpdateArray.add(recentUpdateObject);
+                                        } else {
+                                            System.out.println("page is restricted ");
+                                        }
+                                    }
+                                } else if (type.equals("attachment")) {
+                                    if (resultObject.has("id")) {
+                                        int attachmentId = resultObject.getAsJsonPrimitive("id").getAsInt();
+                                        System.out.println("attachment id is " + attachmentId);
+                                        Attachment attachment = attachmentManager.getAttachment(attachmentId);
+                                        long pageId = attachment.getContainer().getId();
+                                        System.out.println("page id  is " + pageId);
+                                        Page sourcePage = pageManager.getPage(pageId);
+                                        System.out.println("page  is " + sourcePage.toString());
+                                        if (isRestrictedPage(loggedInUser, sourcePage, restrictedGroups)) {
+                                            System.out.println("attachment is not restricted");
+                                            modifiedUpdateArray.add(recentUpdateObject);
+                                        } else {
+                                            System.out.println("attachment is restricted ");
+                                        }
                                     }
                                 }
+                                
                             }
                             if (hasValidUpdates) {
                                 JsonObject changeSetEntryModified = new JsonObject();
@@ -420,6 +448,8 @@ public class AllRequestServlet implements Filter{
                 System.out.println("is a rest request");
 
                 Matcher apiContentMatcher = this.apiContentPattern.matcher(uri);
+
+                System.out.println("matcher wetn fine");
                 
                 
                 System.out.println(uri);
@@ -562,7 +592,7 @@ public class AllRequestServlet implements Filter{
                     System.out.println("+++++++++++++++++++ api content search +++++++++++++++++++++++++");
                     JsonParser jsonParser = new JsonParser();
                     JsonElement jsonElement = jsonParser.parse(responseStr);
-
+                    System.out.println("original perms: ");
                     System.out.println(jsonElement.toString());
                     JsonObject originalResponse = jsonElement.getAsJsonObject();
                     JsonObject modifiedResponse = new JsonObject();
@@ -652,12 +682,14 @@ public class AllRequestServlet implements Filter{
                 else if (uri.startsWith("/confluence/rest/api/content")) {
                     int removedCount = 0;
                     System.out.println("+++++++++++++++++++ api content search +++++++++++++++++++++++++");
+                    if (loggedInUser != null) {
+                        System.out.println(loggedInUser.getName() + " has been identified");
+                    }
                     System.out.println(uri);
-                    System.out.println("+++++++++++++++++++ we out here +++++++++++++++++++++++++");
                     JsonParser jsonParser = new JsonParser();
                     JsonElement jsonElement = jsonParser.parse(responseStr);
 
-                    //System.out.println(jsonElement.toString());
+                    System.out.println(jsonElement.toString());
                     JsonObject originalResponse = jsonElement.getAsJsonObject();
                     JsonObject modifiedResponse = new JsonObject();
                     //JsonArray results = originalResponse.getAsJsonArray("results");
@@ -685,9 +717,27 @@ public class AllRequestServlet implements Filter{
                                                 System.out.println("removed " + id);
                                                 continue;
                                             }
+                                            System.out.println("adding the result ");
                                         }
-                                        resultsArray.add(result);
+                                    } else if (type.equals("attachment")) {
+                                        if (resultObject.has("id")) {
+                                            int attachmentId = resultObject.getAsJsonPrimitive("id").getAsInt();
+                                            System.out.println("attachment id is " + attachmentId);
+                                            Attachment attachment = attachmentManager.getAttachment(attachmentId);
+                                            long pageId = attachment.getContainer().getId();
+                                            System.out.println("page id  is " + pageId);
+                                            Page sourcePage = pageManager.getPage(pageId);
+                                            System.out.println("page  is " + sourcePage.toString());
+                                            if (isRestrictedPage(loggedInUser, sourcePage, restrictedGroups)) {
+                                                removedCount++;
+                                                
+                                                System.out.println("removed attachment" + attachmentId);
+                                                continue;
+                                            }
+                                            System.out.println("adding the result ");
+                                        }
                                     }
+                                    resultsArray.add(result);
                                 }
                                
                             }
@@ -769,55 +819,22 @@ public class AllRequestServlet implements Filter{
     //             return 404/403
     public boolean isRestrictedPage(ConfluenceUser user, int confluencePageId, List<String> restrictedGroups) {
         System.out.println("checking if the page is restricted: " + confluencePageId);
-        Page page = pageManager.getPage(confluencePageId);
+        Page page = this.pageManager.getPage(confluencePageId);
+        System.out.println("id as long: ");
+        if (page == null) {
+            System.out.println("sadly this is null");
+            return false;
+        } else {
+            System.out.println("id as long: " + page.getContentId().toString());
 
-        
-        System.out.println("GOT PAGE");
-        ///First check whether the space is restricted to the user
-        String spaceKey = spaceManager.getSpaceFromPageId(confluencePageId);
-        System.out.println("root space key: " + spaceKey);
-        Space rootSpace = spaceManager.getSpace(spaceKey);
-        System.out.println("root space : " + rootSpace.getName() );
-        if (isRestrictedSpace(user, rootSpace, restrictedGroups)) {
-            return true;
-        }        
-
-        List<ContentPermissionSet> permissionList = contentPermissionManager.getContentPermissionSets(page, ContentPermission.VIEW_PERMISSION);
-        System.out.println("GOT PERMISSION LIST");
-
-        List<String> userGroups = this.userAccessor.getGroupNamesForUserName(user.getName());
-        System.out.println("GOT USER GROUPS");
-
-        List<String> viewGroups = new ArrayList<String>();
-        // Only group permissions are relevant here
-        for (ContentPermissionSet set : permissionList) {
-            for (ContentPermission permission : set) {
-                if (permission.isGroupPermission()) {
-                    viewGroups.add(permission.getGroupName());
-                }
-            }
         }
-        System.out.println("GOT VIEWGFROUPS");
 
-        for (String group : viewGroups) {
-            if (restrictedGroups.contains(group)) {
-                System.out.println("mandatory group present: " + group);
-                System.out.println("user groups:  " + Arrays.toString(userGroups.toArray()));
-
-                if (!userGroups.contains(group)) {
-                    System.out.println("user should NOT be able to see");
-                    return true;
-                }
-            }
-        }
-        System.out.println("RETURINING FALSE");
-        return false;
+        return isRestrictedPage(user, page, restrictedGroups);
     }
 
     public boolean isRestrictedPage(ConfluenceUser user, Page page, List<String> restrictedGroups) {
         long pageId = page.getContentId().asLong();
         System.out.println("checking if the page (from page) is restricted: " + page.getContentId().toString());
-
 
         ///First check whether the space is restricted to the user
         String spaceKey = spaceManager.getSpaceFromPageId(pageId);
@@ -826,7 +843,22 @@ public class AllRequestServlet implements Filter{
         System.out.println("root space : " + rootSpace.getName());
         if (isRestrictedSpace(user, rootSpace, restrictedGroups)) {
             return true;
-        }        
+        }
+        System.out.println("Page is not restricted");
+
+        // Then check whether any ancestors are restricted to the user
+        List<Page> ancestors = page.getAncestors();
+        System.out.println("ancestors: ");
+        System.out.println(Arrays.toString(ancestors.toArray()));
+
+        for (Page ancestor : ancestors) {
+            if (isRestrictedPage(user, ancestor, restrictedGroups)) {
+                System.out.println("ancestor is restricted");
+                return true;
+            } else {
+                System.out.println("ancestor is not restricted");
+            }
+        }
 
         List<ContentPermissionSet> permissionList = contentPermissionManager.getContentPermissionSets(page, ContentPermission.VIEW_PERMISSION);
         System.out.println("there are " + permissionList.size() + " sets of permissions here");
@@ -844,6 +876,8 @@ public class AllRequestServlet implements Filter{
                 }
             }
         }
+        System.out.println("GOT VIEWGFROUPS");
+        System.out.println(Arrays.toString(viewGroups.toArray()));
 
         for (String group : viewGroups) {
             if (restrictedGroups.contains(group)) {
@@ -860,7 +894,7 @@ public class AllRequestServlet implements Filter{
     }
 
     public boolean isRestrictedSpace(ConfluenceUser user, Space space, List<String> restrictedGroups) {        
-        System.out.println("checking if the space (from page) is restricted: " + space.getKey());
+        System.out.println("checking if the space is restricted: " + space.getKey());
 
         // Check whether the restricted groups have permissions on the page
         // if not, we can use the default confluence permissions going forward
@@ -886,7 +920,7 @@ public class AllRequestServlet implements Filter{
                 return true;
             }
         }
-        System.out.println("user can be able to see this  SPACE");
+        System.out.println("user can see this SPACE");
         return false;
     }
 }
