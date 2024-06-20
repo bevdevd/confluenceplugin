@@ -88,7 +88,7 @@ public class AllRequestServlet implements Filter{
     private String[] staticPatterns = {
         "/plugins/pagetree/naturalchildren.action",
     };
-
+    private String prefix = "/confluence";
     private String cattedPattern = "(" + String.join("|", idPatterns) + ")(?<pageId>\\d+)(/.*)?";
     private Pattern staticPattern = Pattern.compile("/plugins/pagetree/naturalchildren.action");
     
@@ -307,9 +307,31 @@ public class AllRequestServlet implements Filter{
                 } else {
                     System.out.println("space is not restricted");
                 }
-            }
+            } 
+            
             System.out.println("CHECKING REST CALLS NOW");
-            if (uri.startsWith("/confluence/pages/viewpage.action")) {
+            if (uri.startsWith("/confluence/dosearchsite.action")) {
+                ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(httpResponse);
+                String modifiedResponseContent;
+                PrintWriter writer = responseWrapper.getWriter();
+                chain.doFilter(request, responseWrapper);
+                // System.out.println("uri: " + uri);
+                // String[] params = uri.split(prefix + "/dosearchsite.action");
+                // System.out.println("params: " + (Arrays.toString(params)));   
+                if (paramMap.containsKey("cql")) {
+                    // Don't let the query occur by the http request header, rely on the rest api (cqlSearch at /confluence/rest/searchv3/1.0/cqlSearch)
+                    System.out.println(Arrays.toString(paramMap.get("cql")));
+                    String newLocation = prefix + "/dosearchsite.action";
+                    httpResponse.sendRedirect(newLocation);
+                    return;
+
+                } else {
+                    System.out.println("no cql found");
+                }
+
+                responseWrapper.copyBodyToResponse();
+            }
+            else if (uri.startsWith("/confluence/pages/viewpage.action")) {
                 System.out.println("=======================================================");
                 System.out.println("is a view page action");
                 ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(httpResponse);
@@ -405,7 +427,6 @@ public class AllRequestServlet implements Filter{
                                         }
                                     }
                                 }
-                                
                             }
                             if (hasValidUpdates) {
                                 JsonObject changeSetEntryModified = new JsonObject();
@@ -487,15 +508,7 @@ public class AllRequestServlet implements Filter{
                     writer.write(modifiedArray.toString());
                     writer.flush();
                     
-                } else if (uri.startsWith("/confluence/dosearchsite.action")) {
-
-                    System.out.println("+++++++++++++++++++ dosearchsite advanced search +++++++++++++++++++++++++");
-                    System.out.println(responseStr);
-                    JsonParser jsonParser = new JsonParser();
-                    JsonElement jsonElement = jsonParser.parse(responseStr);
-                }
-                    
-                else if (uri.startsWith("/confluence/rest/api/search") || uri.startsWith("/confluence/rest/searchv3/1.0/cqlSearch")) {
+                } else if (uri.startsWith("/confluence/rest/api/search") || uri.startsWith("/confluence/rest/searchv3/1.0/cqlSearch")) {
                     int removedCount = 0;
                     System.out.println("+++++++++++++++++++ api search +++++++++++++++++++++++++");
                     JsonParser jsonParser = new JsonParser();
