@@ -23,6 +23,13 @@
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>INCLUDE</dispatcher>  
     <dispatcher>FORWARD</dispatcher>  
+    <weight>1</weight>  
+  </servlet-filter>
+  <servlet-filter key="page-servlet" class="com.example.test.servlet.PageServlet"> 
+    <url-pattern>/display/([a-zA-Z0-9]+)/([^/]+)</url-pattern>  
+    <dispatcher>REQUEST</dispatcher>  
+    <dispatcher>INCLUDE</dispatcher>  
+    <dispatcher>FORWARD</dispatcher>  
     <weight>0</weight>  
   </servlet-filter>
 </atlassian-plugin>
