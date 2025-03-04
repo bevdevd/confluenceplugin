@@ -1,0 +1,98 @@
+{
+    "results": [
+        {
+            "content": {
+                "id": "1015825",
+                "type": "attachment",
+                "status": "current",
+                "title": "Etude_10_8.pdf",
+                "restrictions": {},
+                "_links": {
+                    "webui": "/display/RES/restricted+page+in+restricted+space?preview=%2F1015818%2F1015825%2FEtude_10_8.pdf",
+                    "self": "http://Bevans-MacBook-Pro.local:1990/confluence/rest/api/content/1015825"
+                },
+                "_expandable": {
+                    "container": "",
+                    "metadata": "",
+                    "extensions": "",
+                    "operations": "",
+                    "children": "",
+                    "history": "/rest/api/content/1015825/history",
+                    "ancestors": "",
+                    "body": "",
+                    "version": "",
+                    "descendants": "",
+                    "space": "/rest/api/space/RES"
+                }
+            },
+            "title": "Etude_10_8.pdf",
+            "excerpt": "",
+            "url": "/display/RES/restricted+page+in+restricted+space?preview=%2F1015818%2F1015825%2FEtude_10_8.pdf",
+            "resultParentContainer": {
+                "title": "restricted page in restricted space",
+                "displayUrl": "/display/RES/restricted+page+in+restricted+space"
+            },
+            "resultGlobalContainer": {
+                "title": "restricted",
+                "displayUrl": "/display/RES"
+            },
+            "entityType": "content",
+            "iconCssClass": "content-type-attachment-pdf",
+            "lastModified": "2024-06-06T21:27:04.638+10:00",
+            "friendlyLastModified": "Jun 06, 2024",
+            "timestamp": 1717673224638
+        },
+        {
+            "content": {
+                "id": "1015823",
+                "type": "attachment",
+                "status": "current",
+                "title": "Etude_10_9.pdf",
+                "restrictions": {},
+                "_links": {
+                    "webui": "/display/OPEN/restricte+dpage+in+open+space?preview=%2F1015816%2F1015823%2FEtude_10_9.pdf",
+                    "self": "http://Bevans-MacBook-Pro.local:1990/confluence/rest/api/content/1015823"
+                },
+                "_expandable": {
+                    "container": "",
+                    "metadata": "",
+                    "extensions": "",
+                    "operations": "",
+                    "children": "",
+                    "history": "/rest/api/content/1015823/history",
+                    "ancestors": "",
+                    "body": "",
+                    "version": "",
+                    "descendants": "",
+                    "space": "/rest/api/space/OPEN"
+                }
+            },
+            "title": "Etude_10_9.pdf",
+            "excerpt": "",
+            "url": "/display/OPEN/restricte+dpage+in+open+space?preview=%2F1015816%2F1015823%2FEtude_10_9.pdf",
+            "resultParentContainer": {
+                "title": "restricte dpage in open space",
+                "displayUrl": "/display/OPEN/restricte+dpage+in+open+space"
+            },
+            "resultGlobalContainer": {
+                "title": "open",
+                "displayUrl": "/display/OPEN"
+            },
+            "entityType": "content",
+            "iconCssClass": "content-type-attachment-pdf",
+            "lastModified": "2024-06-06T11:10:58.412+10:00",
+            "friendlyLastModified": "Jun 06, 2024",
+            "timestamp": 1717636258412
+        }
+    ],
+    "start": 0,
+    "limit": 20,
+    "size": 2,
+    "totalSize": 2,
+    "cqlQuery": "siteSearch ~ \"etude\" AND type in (\"space\",\"user\",\"com.atlassian.confluence.extra.team-calendars:calendar-content-type\",\"attachment\",\"page\",\"com.atlassian.confluence.extra.team-calendars:space-calendars-view-content-type\",\"blogpost\")",
+    "searchDuration": 25,
+    "_links": {
+        "base": "http://Bevans-MacBook-Pro.local:1990/confluence",
+        "context": "/confluence"
+    }
+}
