@@ -1,0 +1,22 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+  * Content Title Pattern
+  *
+  * This is a facade for the Page Title Pattern for cases in which the subject of the notification
+  *   is a standard content type that can be expressed by the current content API (page, comment etc).
+  *
+  * @param content com.atlassian.confluence.api.model.content.Content
+  * @param? pageTitleInlinePattern
+  * @param? deleted
+  */
+{template .contentTitlePattern}
+{call Confluence.Templates.Mail.Content.pageTitlePattern}
+    {param titleText: $content.title /}
+    {param contentUrl:  contentUrl($content)/}
+    {param contentType: $content.type /}
+    {param contentIconResourceModule: 'com.atlassian.confluence.plugins.confluence-email-resources:content-type-icons'/}
+    {param contentIconResourceKey: $content.type + '-icon'/}
+    {param pageTitleInlinePattern: $pageTitleInlinePattern /}
+    {param deleted: $deleted /}
+{/call}
+{/template}

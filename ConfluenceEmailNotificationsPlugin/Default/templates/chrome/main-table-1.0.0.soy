@@ -1,0 +1,109 @@
+{namespace Confluence.Templates.Mail.Chrome}
+/**
+ * Main template used by ADG Notification. Includes a table that contains all content and consists of four
+ * distinct notification areas: header, contentArea, contextualArea and footer
+ * @param? header the header of the notification, contains an avatar,username and the action the notification pertains to
+ * @param contentArea the main body of the notification, contains notification contents
+ * @param? contextualArea additional meta data related to a given notification
+ * @param footer the notification footer, containing some management links, information and logos
+ * @param? htmlHeader the HTML header of the email (<head>...</head>), will just use .htmlHeader if none is provided
+ * @param? centerContent center the content with a max width
+ * @param? class a class appended to the main container table to help target CSS
+ * @param? webFragmentContext a map made available to web-panels and items; see NotificationContext.WEB_FRAGMENT_CONTEXT
+ */
+{template .mainTable}
+{if $htmlHeader}
+    {$htmlHeader|noAutoescape}
+{else}
+    {call .htmlHeader/}
+{/if}
+<body>
+{debugOutput('<div style=\"border: 1px solid #FF0080; padding: 0px; margin: 0px; width: auto;\">')|noAutoescape}
+<table id="background-table" {if $class}class="{$class}"{/if} cellpadding="0" cellspacing="0" width="100%">
+{if $centerContent}
+<tr>
+<td>
+<table id="center-content-table" cellpadding="0" cellspacing="0" align="center">
+{/if}
+{if $header}
+    {$header|noAutoescape}
+{/if}
+<tr>
+    <td id="email-content-container" {if not $header}class="email-content-top-padding"{/if}>
+        <table id="email-content-table" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                /* there needs to be content in the cell for it to render in some clients*/
+                <td class="email-content-rounded-top mobile-expand">&nbsp;</td>
+            </tr>
+            {if $contentArea}
+                /*
+                    There's an interesting discussion in a code review at
+                      https://stash.atlassian.com/projects/CONF/repos/confluence/pull-requests/1352/overview?commentId=9399
+                    about how the following for loop could be used as in injection point for web-panels. The discussion
+                    revolves around providing the ability for plugins to insert content after the title, before the
+                    footer, etc, of EVERY email (that doesn't opt out) without needing to update every email template to
+                    accept the plugin points.
+                      Anyone thinking that this sounds like a good deal should bother dT or Ted P.
+                */
+                {foreach $pattern in $contentArea}
+                {if $pattern}
+                    {let $content}
+                        {if $pattern.content or $pattern.id or $pattern.class}
+                            {if $pattern.content}
+                                {$pattern.content|noAutoescape}
+                            {/if}
+                        {else}
+                            {$pattern|noAutoescape}
+                        {/if}
+                    {/let}
+                    {if $content}
+                    <tr>
+                        <td {if $pattern.id}id="{$pattern.id}" {/if}class="email-content-main mobile-expand{if $pattern.class} {$pattern.class}{/if}{if isLast($pattern)} last-row-padding{/if}">
+                            {$content|noAutoescape}
+                        </td>
+                    </tr>
+                    {/if}
+                {/if}
+                {/foreach}
+            {/if}
+            /* there needs to be content in the cell for it to render in some clients*/
+            <tr>
+                <td class="email-content-rounded-bottom mobile-expand">&nbsp;</td>
+            </tr>
+        </table>
+    </td>
+</tr>
+
+{if $contextualArea}
+<tr>
+    <td class="contextual-area-pattern">
+        {$contextualArea|noAutoescape}
+    </td>
+</tr>
+{/if}
+
+{if $footer}
+    {$footer|noAutoescape}
+{/if}
+
+{if $centerContent}
+</table>
+</td>
+</tr>
+{/if}
+</table>
+{debugOutput('</div>')|noAutoescape}
+/* Hidden elements can be used for tracking and mail-client filtering */
+<table id="sealed-section" border="0" cellpadding="0" cellspacing="0" width="0">
+    <tr>
+        <td>
+            {call Confluence.Templates.Mail.Utils.renderWebPanels}
+                {param location: 'atl.email.hidden.panel'/}
+                {param context: $webFragmentContext/}
+            {/call}
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+{/template}

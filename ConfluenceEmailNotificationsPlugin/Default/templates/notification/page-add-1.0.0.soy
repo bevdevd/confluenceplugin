@@ -1,0 +1,47 @@
+{namespace Confluence.Templates.Mail.Notifications}
+/**
+ * @param avatarCid
+ * @param modifier
+ * @param contentType
+ * @param content
+ * @param contentHtml
+ * @param actionLinks
+ * @param footerLinks
+ */
+{template .pageAdd}
+    {natto(['soy-template-file-name' : 'page-add-1.0.0.soy', 'deprecate-in-version' : '5.5', 'remove-in-version' : '6.2'])}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.pageTitlePattern}
+            {param contentType: $contentType/}
+            {param titleText: $content.title/}
+            {param contentUrl}
+                {baseUrl()}{$content.urlPath}
+            {/param}
+        {/call}
+    {/let}
+    {let $contentExcerpt}
+        {call Confluence.Templates.Mail.Content.contentExcerptPattern}
+            {param contentExcerpt: $contentHtml/}
+        {/call}
+    {/let}
+    {let $pageActions}
+        {call Confluence.Templates.Mail.Content.actionsPattern}
+            {param actions: $actionLinks/}
+        {/call}
+    {/let}
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.created.a.page')/}
+                {param avatarImage: $avatarCid/}
+                {param user: $modifier/}
+            {/call}
+        {/param}
+        {param contentArea: [$pageTitle, $contentExcerpt, ['class' : 'action-padding', 'content' : $pageActions]]/}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: $footerLinks/}
+            {/call}
+        {/param}
+    {/call}
+{/template}

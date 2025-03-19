@@ -1,0 +1,611 @@
+/* "less" transformation does not work in Soy templates, so we can't include other *.less files
+    So there was a special file was introduced for email notifications, so we have two files:
+    1. tables.less in confluence core - styles for UI
+    2. tables-for-emails.css (in Notification plugin) - styles for email notifications
+    So these both files should be updated in case of changes
+ */
+/* Neutrals */
+/* Colors */
+/* Miscellaneous */
+.confluenceTable {
+    border-collapse: collapse;
+}
+.confluenceTh,
+.confluenceTd {
+    border: 1px solid #C1C7D0;
+    /* CONFDEV-13618: line-height will add up 3 pixels, so we have a 10px top padding for text. Images will remain with 7px top margin though (see thread in Stash) */
+    padding: 7px 10px;
+    text-align: left;
+    /* CONF-39943: set table cell min-width to which cursor can be focused */
+    min-width: 8px;
+}
+/* Lists in tables */
+.confluenceTable ol,
+.confluenceTable ul {
+    margin-left: 0;
+    padding-left: 22px;
+    /* CONFDEV-12589: default left padding is far too wide */
+}
+/* all tables should have a top margin of 10px */
+.confluenceTable,
+.table-wrap {
+    margin: 10px 0 0 0;
+    overflow-x: auto;
+}
+/* an exception to above rule for tables that are first child */
+.confluenceTable:first-child,
+.table-wrap:first-child {
+    margin-top: 0;
+}
+/* Standard background color */
+table.confluenceTable th.confluenceTh {
+    background-color: #F4F5F7;
+}
+/* Standard selected background color */
+table.confluenceTable th.confluenceTh[data-mce-selected="1"] {
+    background-color: #c2daf9;
+}
+table.confluenceTable td.confluenceTd[data-mce-selected] {
+    background-color: #edf5ff;
+}
+/* legacy colors */
+table.confluenceTable th.confluenceTh.highlight-grey,
+table.confluenceTable td.confluenceTd.highlight-grey {
+    background-color: #F4F5F7;
+}
+table.confluenceTable th.confluenceTh.highlight-grey[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-grey[data-mce-selected="1"] {
+    background-color: #c2daf9;
+}
+table.confluenceTable th.confluenceTh.highlight-blue,
+table.confluenceTable td.confluenceTd.highlight-blue {
+    background-color: #DEEBFF;
+}
+table.confluenceTable th.confluenceTh.highlight-blue[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-blue[data-mce-selected="1"] {
+    background-color: #b2d3ff;
+}
+table.confluenceTable th.confluenceTh.highlight-green,
+table.confluenceTable td.confluenceTd.highlight-green {
+    background-color: #E3FCEF;
+}
+table.confluenceTable th.confluenceTh.highlight-green[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-green[data-mce-selected="1"] {
+    background-color: #b6dff4;
+}
+table.confluenceTable th.confluenceTh.highlight-yellow,
+table.confluenceTable td.confluenceTd.highlight-yellow {
+    background-color: #FFFAE6;
+}
+table.confluenceTable th.confluenceTh.highlight-yellow[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-yellow[data-mce-selected="1"] {
+    background-color: #c9ddee;
+}
+table.confluenceTable th.confluenceTh.highlight-red,
+table.confluenceTable td.confluenceTd.highlight-red {
+    background-color: #FFEBE6;
+}
+table.confluenceTable th.confluenceTh.highlight-red[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-red[data-mce-selected="1"] {
+    background-color: #c9d3ee;
+}
+/* legacy colors end */
+/* ADG3 colors */
+table.confluenceTable th.confluenceTh.highlight-\#091e42,
+table.confluenceTable td.confluenceTd.highlight-\#091e42 {
+    background-color: #091E42;
+}
+table.confluenceTable th.confluenceTh.highlight-\#091e42[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#091e42[data-mce-selected="1"] {
+    background-color: #1d437b;
+}
+table.confluenceTable th.confluenceTh.highlight-\#172b4d,
+table.confluenceTable td.confluenceTd.highlight-\#172b4d {
+    background-color: #172B4D;
+}
+table.confluenceTable th.confluenceTh.highlight-\#172b4d[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#172b4d[data-mce-selected="1"] {
+    background-color: #274c82;
+}
+table.confluenceTable th.confluenceTh.highlight-\#253858,
+table.confluenceTable td.confluenceTd.highlight-\#253858 {
+    background-color: #253858;
+}
+table.confluenceTable th.confluenceTh.highlight-\#253858[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#253858[data-mce-selected="1"] {
+    background-color: #31558a;
+}
+table.confluenceTable th.confluenceTh.highlight-\#344563,
+table.confluenceTable td.confluenceTd.highlight-\#344563 {
+    background-color: #344563;
+}
+table.confluenceTable th.confluenceTh.highlight-\#344563[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#344563[data-mce-selected="1"] {
+    background-color: #3b5f92;
+}
+table.confluenceTable th.confluenceTh.highlight-\#42526e,
+table.confluenceTable td.confluenceTd.highlight-\#42526e {
+    background-color: #42526E;
+}
+table.confluenceTable th.confluenceTh.highlight-\#42526e[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#42526e[data-mce-selected="1"] {
+    background-color: #45689a;
+}
+table.confluenceTable th.confluenceTh.highlight-\#505f79,
+table.confluenceTable td.confluenceTd.highlight-\#505f79 {
+    background-color: #505F79;
+}
+table.confluenceTable th.confluenceTh.highlight-\#505f79[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#505f79[data-mce-selected="1"] {
+    background-color: #4f71a1;
+}
+table.confluenceTable th.confluenceTh.highlight-\#5e6c84,
+table.confluenceTable td.confluenceTd.highlight-\#5e6c84 {
+    background-color: #5E6C84;
+}
+table.confluenceTable th.confluenceTh.highlight-\#5e6c84[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#5e6c84[data-mce-selected="1"] {
+    background-color: #597aa9;
+}
+table.confluenceTable th.confluenceTh.highlight-\#6b778c,
+table.confluenceTable td.confluenceTd.highlight-\#6b778c {
+    background-color: #6B778C;
+}
+table.confluenceTable th.confluenceTh.highlight-\#6b778c[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#6b778c[data-mce-selected="1"] {
+    background-color: #6282af;
+}
+table.confluenceTable th.confluenceTh.highlight-\#7a869a,
+table.confluenceTable td.confluenceTd.highlight-\#7a869a {
+    background-color: #7A869A;
+}
+table.confluenceTable th.confluenceTh.highlight-\#7a869a[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#7a869a[data-mce-selected="1"] {
+    background-color: #6c8cb8;
+}
+table.confluenceTable th.confluenceTh.highlight-\#8993a4,
+table.confluenceTable td.confluenceTd.highlight-\#8993a4 {
+    background-color: #8993A4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#8993a4[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#8993a4[data-mce-selected="1"] {
+    background-color: #7795bf;
+}
+table.confluenceTable th.confluenceTh.highlight-\#97a0af,
+table.confluenceTable td.confluenceTd.highlight-\#97a0af {
+    background-color: #97A0AF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#97a0af[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#97a0af[data-mce-selected="1"] {
+    background-color: #819ec7;
+}
+table.confluenceTable th.confluenceTh.highlight-\#a5adba,
+table.confluenceTable td.confluenceTd.highlight-\#a5adba {
+    background-color: #A5ADBA;
+}
+table.confluenceTable th.confluenceTh.highlight-\#a5adba[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#a5adba[data-mce-selected="1"] {
+    background-color: #8aa7cf;
+}
+table.confluenceTable th.confluenceTh.highlight-\#b3bac5,
+table.confluenceTable td.confluenceTd.highlight-\#b3bac5 {
+    background-color: #B3BAC5;
+}
+table.confluenceTable th.confluenceTh.highlight-\#b3bac5[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#b3bac5[data-mce-selected="1"] {
+    background-color: #94b0d6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#c1c7d0,
+table.confluenceTable td.confluenceTd.highlight-\#c1c7d0 {
+    background-color: #C1C7D0;
+}
+table.confluenceTable th.confluenceTh.highlight-\#c1c7d0[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#c1c7d0[data-mce-selected="1"] {
+    background-color: #9eb9de;
+}
+table.confluenceTable th.confluenceTh.highlight-\#dfe1e6,
+table.confluenceTable td.confluenceTd.highlight-\#dfe1e6 {
+    background-color: #DFE1E6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#dfe1e6[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#dfe1e6[data-mce-selected="1"] {
+    background-color: #b3ccee;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ebecf0,
+table.confluenceTable td.confluenceTd.highlight-\#ebecf0 {
+    background-color: #EBECF0;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ebecf0[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ebecf0[data-mce-selected="1"] {
+    background-color: #bbd3f5;
+}
+table.confluenceTable th.confluenceTh.highlight-\#f4f5f7,
+table.confluenceTable td.confluenceTd.highlight-\#f4f5f7 {
+    background-color: #F4F5F7;
+}
+table.confluenceTable th.confluenceTh.highlight-\#f4f5f7[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#f4f5f7[data-mce-selected="1"] {
+    background-color: #c2daf9;
+}
+table.confluenceTable th.confluenceTh.highlight-\#fafbfc,
+table.confluenceTable td.confluenceTd.highlight-\#fafbfc {
+    background-color: #FAFBFC;
+}
+table.confluenceTable th.confluenceTh.highlight-\#fafbfc[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#fafbfc[data-mce-selected="1"] {
+    background-color: #c6defd;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffffff,
+table.confluenceTable td.confluenceTd.highlight-\#ffffff {
+    background-color: #FFFFFF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffffff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ffffff[data-mce-selected="1"] {
+    background-color: #c9e1ff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#bf2600,
+table.confluenceTable td.confluenceTd.highlight-\#bf2600 {
+    background-color: #BF2600;
+}
+table.confluenceTable th.confluenceTh.highlight-\#bf2600[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#bf2600[data-mce-selected="1"] {
+    background-color: #9d494d;
+}
+table.confluenceTable th.confluenceTh.highlight-\#de350b,
+table.confluenceTable td.confluenceTd.highlight-\#de350b {
+    background-color: #DE350B;
+}
+table.confluenceTable th.confluenceTh.highlight-\#de350b[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#de350b[data-mce-selected="1"] {
+    background-color: #b25354;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff5630,
+table.confluenceTable td.confluenceTd.highlight-\#ff5630 {
+    background-color: #FF5630;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff5630[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ff5630[data-mce-selected="1"] {
+    background-color: #c96a6e;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff7452,
+table.confluenceTable td.confluenceTd.highlight-\#ff7452 {
+    background-color: #FF7452;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff7452[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ff7452[data-mce-selected="1"] {
+    background-color: #c97f86;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff8f73,
+table.confluenceTable td.confluenceTd.highlight-\#ff8f73 {
+    background-color: #FF8F73;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff8f73[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ff8f73[data-mce-selected="1"] {
+    background-color: #c9929d;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffbdad,
+table.confluenceTable td.confluenceTd.highlight-\#ffbdad {
+    background-color: #FFBDAD;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffbdad[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ffbdad[data-mce-selected="1"] {
+    background-color: #c9b2c6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffebe6,
+table.confluenceTable td.confluenceTd.highlight-\#ffebe6 {
+    background-color: #FFEBE6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffebe6[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ffebe6[data-mce-selected="1"] {
+    background-color: #c9d3ee;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff8b00,
+table.confluenceTable td.confluenceTd.highlight-\#ff8b00 {
+    background-color: #FF8B00;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff8b00[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ff8b00[data-mce-selected="1"] {
+    background-color: #c9904d;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff991f,
+table.confluenceTable td.confluenceTd.highlight-\#ff991f {
+    background-color: #FF991F;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ff991f[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ff991f[data-mce-selected="1"] {
+    background-color: #c99962;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffab00,
+table.confluenceTable td.confluenceTd.highlight-\#ffab00 {
+    background-color: #FFAB00;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffab00[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ffab00[data-mce-selected="1"] {
+    background-color: #c9a64d;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffc400,
+table.confluenceTable td.confluenceTd.highlight-\#ffc400 {
+    background-color: #FFC400;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffc400[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ffc400[data-mce-selected="1"] {
+    background-color: #c9b74d;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffe380,
+table.confluenceTable td.confluenceTd.highlight-\#ffe380 {
+    background-color: #FFE380;
+}
+table.confluenceTable th.confluenceTh.highlight-\#ffe380[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#ffe380[data-mce-selected="1"] {
+    background-color: #c9cda6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#fff0b3,
+table.confluenceTable td.confluenceTd.highlight-\#fff0b3 {
+    background-color: #FFF0B3;
+}
+table.confluenceTable th.confluenceTh.highlight-\#fff0b3[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#fff0b3[data-mce-selected="1"] {
+    background-color: #c9d6ca;
+}
+table.confluenceTable th.confluenceTh.highlight-\#fffae6,
+table.confluenceTable td.confluenceTd.highlight-\#fffae6 {
+    background-color: #FFFAE6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#fffae6[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#fffae6[data-mce-selected="1"] {
+    background-color: #c9ddee;
+}
+table.confluenceTable th.confluenceTh.highlight-\#006644,
+table.confluenceTable td.confluenceTd.highlight-\#006644 {
+    background-color: #006644;
+}
+table.confluenceTable th.confluenceTh.highlight-\#006644[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#006644[data-mce-selected="1"] {
+    background-color: #17767c;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00875a,
+table.confluenceTable td.confluenceTd.highlight-\#00875a {
+    background-color: #00875A;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00875a[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#00875a[data-mce-selected="1"] {
+    background-color: #178d8c;
+}
+table.confluenceTable th.confluenceTh.highlight-\#36b37e,
+table.confluenceTable td.confluenceTd.highlight-\#36b37e {
+    background-color: #36B37E;
+}
+table.confluenceTable th.confluenceTh.highlight-\#36b37e[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#36b37e[data-mce-selected="1"] {
+    background-color: #3daca5;
+}
+table.confluenceTable th.confluenceTh.highlight-\#57d9a3,
+table.confluenceTable td.confluenceTd.highlight-\#57d9a3 {
+    background-color: #57D9A3;
+}
+table.confluenceTable th.confluenceTh.highlight-\#57d9a3[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#57d9a3[data-mce-selected="1"] {
+    background-color: #54c6bf;
+}
+table.confluenceTable th.confluenceTh.highlight-\#79f2c0,
+table.confluenceTable td.confluenceTd.highlight-\#79f2c0 {
+    background-color: #79F2C0;
+}
+table.confluenceTable th.confluenceTh.highlight-\#79f2c0[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#79f2c0[data-mce-selected="1"] {
+    background-color: #6bd8d3;
+}
+table.confluenceTable th.confluenceTh.highlight-\#abf5d1,
+table.confluenceTable td.confluenceTd.highlight-\#abf5d1 {
+    background-color: #ABF5D1;
+}
+table.confluenceTable th.confluenceTh.highlight-\#abf5d1[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#abf5d1[data-mce-selected="1"] {
+    background-color: #8fdadf;
+}
+table.confluenceTable th.confluenceTh.highlight-\#e3fcef,
+table.confluenceTable td.confluenceTd.highlight-\#e3fcef {
+    background-color: #E3FCEF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#e3fcef[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#e3fcef[data-mce-selected="1"] {
+    background-color: #b6dff4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#008da6,
+table.confluenceTable td.confluenceTd.highlight-\#008da6 {
+    background-color: #008DA6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#008da6[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#008da6[data-mce-selected="1"] {
+    background-color: #1791c1;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00a3bf,
+table.confluenceTable td.confluenceTd.highlight-\#00a3bf {
+    background-color: #00A3BF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00a3bf[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#00a3bf[data-mce-selected="1"] {
+    background-color: #17a0d2;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00b8d9,
+table.confluenceTable td.confluenceTd.highlight-\#00b8d9 {
+    background-color: #00B8D9;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00b8d9[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#00b8d9[data-mce-selected="1"] {
+    background-color: #17afe4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00c7e6,
+table.confluenceTable td.confluenceTd.highlight-\#00c7e6 {
+    background-color: #00C7E6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#00c7e6[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#00c7e6[data-mce-selected="1"] {
+    background-color: #17b9ee;
+}
+table.confluenceTable th.confluenceTh.highlight-\#79e2f2,
+table.confluenceTable td.confluenceTd.highlight-\#79e2f2 {
+    background-color: #79E2F2;
+}
+table.confluenceTable th.confluenceTh.highlight-\#79e2f2[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#79e2f2[data-mce-selected="1"] {
+    background-color: #6bccf6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#b3f5ff,
+table.confluenceTable td.confluenceTd.highlight-\#b3f5ff {
+    background-color: #B3F5FF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#b3f5ff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#b3f5ff[data-mce-selected="1"] {
+    background-color: #94daff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#e6fcff,
+table.confluenceTable td.confluenceTd.highlight-\#e6fcff {
+    background-color: #E6FCFF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#e6fcff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#e6fcff[data-mce-selected="1"] {
+    background-color: #b8dfff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#0747a6,
+table.confluenceTable td.confluenceTd.highlight-\#0747a6 {
+    background-color: #0747A6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#0747a6[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#0747a6[data-mce-selected="1"] {
+    background-color: #1c60c1;
+}
+table.confluenceTable th.confluenceTh.highlight-\#0052cc,
+table.confluenceTable td.confluenceTd.highlight-\#0052cc {
+    background-color: #0052CC;
+}
+table.confluenceTable th.confluenceTh.highlight-\#0052cc[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#0052cc[data-mce-selected="1"] {
+    background-color: #1768db;
+}
+table.confluenceTable th.confluenceTh.highlight-\#0065ff,
+table.confluenceTable td.confluenceTd.highlight-\#0065ff {
+    background-color: #0065FF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#0065ff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#0065ff[data-mce-selected="1"] {
+    background-color: #1775ff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#2684ff,
+table.confluenceTable td.confluenceTd.highlight-\#2684ff {
+    background-color: #2684FF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#2684ff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#2684ff[data-mce-selected="1"] {
+    background-color: #318bff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#4c9aff,
+table.confluenceTable td.confluenceTd.highlight-\#4c9aff {
+    background-color: #4C9AFF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#4c9aff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#4c9aff[data-mce-selected="1"] {
+    background-color: #4c9aff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#b3d4ff,
+table.confluenceTable td.confluenceTd.highlight-\#b3d4ff {
+    background-color: #B3D4FF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#b3d4ff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#b3d4ff[data-mce-selected="1"] {
+    background-color: #94c3ff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#deebff,
+table.confluenceTable td.confluenceTd.highlight-\#deebff {
+    background-color: #DEEBFF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#deebff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#deebff[data-mce-selected="1"] {
+    background-color: #b2d3ff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#403294,
+table.confluenceTable td.confluenceTd.highlight-\#403294 {
+    background-color: #403294;
+}
+table.confluenceTable th.confluenceTh.highlight-\#403294[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#403294[data-mce-selected="1"] {
+    background-color: #4451b4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#5243aa,
+table.confluenceTable td.confluenceTd.highlight-\#5243aa {
+    background-color: #5243AA;
+}
+table.confluenceTable th.confluenceTh.highlight-\#5243aa[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#5243aa[data-mce-selected="1"] {
+    background-color: #505dc4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#6554c0,
+table.confluenceTable td.confluenceTd.highlight-\#6554c0 {
+    background-color: #6554C0;
+}
+table.confluenceTable th.confluenceTh.highlight-\#6554c0[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#6554c0[data-mce-selected="1"] {
+    background-color: #5d69d3;
+}
+table.confluenceTable th.confluenceTh.highlight-\#8777d9,
+table.confluenceTable td.confluenceTd.highlight-\#8777d9 {
+    background-color: #8777D9;
+}
+table.confluenceTable th.confluenceTh.highlight-\#8777d9[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#8777d9[data-mce-selected="1"] {
+    background-color: #7582e4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#998dd9,
+table.confluenceTable td.confluenceTd.highlight-\#998dd9 {
+    background-color: #998DD9;
+}
+table.confluenceTable th.confluenceTh.highlight-\#998dd9[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#998dd9[data-mce-selected="1"] {
+    background-color: #8291e4;
+}
+table.confluenceTable th.confluenceTh.highlight-\#c0b6f2,
+table.confluenceTable td.confluenceTd.highlight-\#c0b6f2 {
+    background-color: #C0B6F2;
+}
+table.confluenceTable th.confluenceTh.highlight-\#c0b6f2[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#c0b6f2[data-mce-selected="1"] {
+    background-color: #9daef6;
+}
+table.confluenceTable th.confluenceTh.highlight-\#eae6ff,
+table.confluenceTable td.confluenceTd.highlight-\#eae6ff {
+    background-color: #EAE6FF;
+}
+table.confluenceTable th.confluenceTh.highlight-\#eae6ff[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#eae6ff[data-mce-selected="1"] {
+    background-color: #bbcfff;
+}
+table.confluenceTable th.confluenceTh.highlight-\#000000,
+table.confluenceTable td.confluenceTd.highlight-\#000000 {
+    background-color: #000000;
+}
+table.confluenceTable th.confluenceTh.highlight-\#000000[data-mce-selected="1"],
+table.confluenceTable td.confluenceTd.highlight-\#000000[data-mce-selected="1"] {
+    background-color: #172e4d;
+}
+/* ADG3 colors end */
+table.confluenceTable th.confluenceTh {
+    font-weight: bold;
+}
+table.confluenceTable th.confluenceTh.nohighlight {
+    font-weight: normal;
+    background-color: transparent;
+}
+table.confluenceTable td.confluenceTd img,
+table.confluenceTable td.confluenceTd .confluence-embedded-file-wrapper img,
+table.confluenceTable th.confluenceTh .confluence-embedded-file-wrapper img {
+    max-width: none;
+}
+table.confluenceTable td.numberingColumn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}

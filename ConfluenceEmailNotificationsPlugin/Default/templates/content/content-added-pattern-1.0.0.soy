@@ -1,0 +1,58 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Content Added Pattern
+ * @param attachments
+ * @param? deleted
+ */
+{template .contentAddedPattern}
+<table class="content-added-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    {foreach $attachmentMetadata in $attachments}
+    {let $attachment : $attachmentMetadata.attachment/}
+    <tr>
+        <td class="content-added-pattern-icon-container">
+            <table>
+                <tr>
+                    <td class="content-added-pattern-icon">
+                        <img class="content-added-pattern-icon-image" src="cid:{$attachmentMetadata.cid}-icon" alt="attachment" title="attachment" height="16" width="16" border="0"  />
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td class="content-added-pattern-text">
+            <table {if $deleted}align="left"{/if}>
+                <tr>
+                    <td class="content-added-pattern-text-container mobile-resize-text {if $deleted}content-deleted-color{/if}">
+                        <span style="vertical-align: middle">
+                        {if not $deleted}
+                            <a href="{sourceLink(baseUrl() + $attachment.downloadPath)}" title="">
+                        {/if}
+                            {$attachment.fileName}
+                        {if not $deleted}
+                            </a>
+                        {/if}
+                        {sp}&bull;{sp}
+                            {$attachment.niceFileSize}{sp}{getText($attachmentMetadata.i18nKey)}
+                        </span>
+                        &nbsp;
+                        {if $deleted}
+                            {call Confluence.Templates.Mail.Content.contentDeletedLozengePattern/}
+                        {/if}
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    {if $attachment.comment}
+    /* Optional comment */
+    <tr>
+        <td>
+        </td>
+        <td class="content-added-pattern-text mobile-resize-text{if $deleted} content-deleted-color{/if}">
+            {$attachment.comment}
+        </td>
+    </tr>
+    {/if}
+    {/foreach}
+</table>
+{/template}

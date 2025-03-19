@@ -1,0 +1,17 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+ * Creates a link.
+ * @param urlString
+ */
+{template .sourceLink}
+    {{natto(['soy-template-file-name' : 'source-link-1.0.0.soy', 'deprecate-in-version' : '5.5', 'remove-in-version' : '6.2'], 'Use the [sourceLink] function instead, e.g. "{sourceLink($urlString)}".')}}
+
+    {$urlString|noAutoescape}
+    {if strContains($urlString, '#')}
+    //nothing - see https://jira.atlassian.com/browse/CONFDEV-17077
+    {elseif strContains($urlString, '?')}
+         &amp;src=email
+    {else}
+        ?src=email
+    {/if}
+{/template}

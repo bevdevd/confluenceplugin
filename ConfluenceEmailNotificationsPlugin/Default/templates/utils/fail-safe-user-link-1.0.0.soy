@@ -1,0 +1,17 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+ * @param user
+ * @param? linkTextHtml
+ */
+{template .failsafeUserLink}
+    {if $user.email}
+        {call .userLink}
+            {param user: $user/}
+            {param linkTextHtml: $linkTextHtml/}
+        {/call}
+    {else}
+        {if $linkTextHtml}
+            {$linkTextHtml|noAutoescape}
+        {/if}
+    {/if}
+{/template}

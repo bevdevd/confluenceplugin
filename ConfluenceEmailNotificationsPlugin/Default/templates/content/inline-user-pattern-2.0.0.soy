@@ -1,0 +1,16 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Inline User Pattern
+ * @param actionString
+ * @param user
+ */
+{template .inlineUserPattern}
+<span id="inline-user-pattern" class="mobile-resize-text">
+    {$actionString}&nbsp;
+    <img id="inline-user-pattern-avatar-image" src="{avatarImage($user)}" width="16" height="16"/>&nbsp;
+    {call Confluence.Templates.Mail.Utils.userLink}
+        {param user: $user/}
+        {param linkTextHtml}{$user.fullName}{/param}
+    {/call}
+</span>
+{/template}

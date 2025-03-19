@@ -1,0 +1,425 @@
+{namespace Confluence.Templates.Mail.Notifications.Batch}
+
+/**
+ * @param actions
+ */
+{template .batchActions private="true"}
+<table class="batch-actions actions-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td class="actions-pattern-container" valign="middle">
+            /* Loop for secondary actions as necessary */
+            {if $actions}
+                {foreach $action in $actions}
+                    {if $action}
+                    <table {if not isLast($action)}align="left"{/if}>
+                        <tr>
+                            {let $link: webItemLink($action) /}
+                            <td class="actions-pattern-action-text-container">
+                                /* secondary action text */
+                                <a href="{$link}" title="{$action.label}">{$action.label}</a>
+                            </td>
+                            {if not isLast($action)}
+                            <td class="actions-pattern-action-bull">
+                                &bull;
+                            </td>
+                            {/if}
+                        </tr>
+                    </table>
+                    {/if}
+                {/foreach}
+            {/if}
+        </td>
+    </tr>
+</table>
+{/template}
+
+/**
+ * @param userKey
+ */
+{template .batchUserFullname private="true"}
+<span class="batch-user-fullname">
+    {$userKey != null ? userFullName($userKey) : getText('confluence.mail.templates.anonymous.name')}
+</span>
+{/template}
+
+/**
+ * @param userKeys
+ */
+{template .batchUserFullnameList private="true"}
+    {let $userLength : length($userKeys) /}
+    {if $userLength == 0}
+    {elseif $userLength == 1}
+        {call .batchUserFullname}
+            {param userKey : $userKeys[0] /}
+        {/call}
+    {elseif $userLength == 2}
+        {let $user1}
+            {call .batchUserFullname}
+                {param userKey : $userKeys[0] /}
+            {/call}
+        {/let}
+        {let $user2}
+            {call .batchUserFullname}
+                {param userKey : $userKeys[1] /}
+            {/call}
+        {/let}
+        {getText('notifications.batch.userList.users2', $user1, $user2)|noAutoescape}
+    {else}
+        {let $user1}
+            {call .batchUserFullname}
+                {param userKey : $userKeys[0] /}
+            {/call}
+        {/let}
+        {let $user2}
+            {call .batchUserFullname}
+                {param userKey : $userKeys[1] /}
+            {/call}
+        {/let}
+        {let $count : $userLength - 2 /}
+        {let $countSpan}
+            <span class="batch-user-fullname">{$count}</span>
+        {/let}
+        {getText('notifications.batch.userList.usersOthers', $user1, $user2, $count)|noAutoescape}
+    {/if}
+{/template}
+
+/**
+ * @param parts
+ */
+{template .batchMessage private="true"}
+    <span class="batch-message">
+        {foreach $part in $parts}
+            {call .batchElement}
+                {param element : $part/}
+            {/call}
+        {/foreach}
+    </span>
+{/template}
+
+/**
+ * @param thread
+ */
+{template .batchCommentPattern private="true"}
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td class="header-pattern-container batch-comment">
+    <table class="header-pattern" cellspacing="0" cellpadding="0" boder="0" width="100%">
+        <tr>
+            <td class="header-avatar-image-container" valign="top">
+                <img class="header-avatar-image image_fix" src="{avatarImage($thread.authors[0])}" height="32" width="32" border="0" />
+            </td>
+            <td class="header-text-container {if $thread.contextual}batch-context{/if}" valign="middle">
+                <table align="left">
+                    <tr>
+                        <td valign="middle">
+                            {call .batchElement}
+                                {param element : $thread.message /}
+                            {/call}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        {if isNonnull($thread.inlineContext)}
+        <tr>
+            <td></td>
+            <td class="batch-highlight">
+                <span>{$thread.inlineContext}</span>
+            </td>
+        </tr>
+        {/if}
+        {if isNonnull($thread.commentBody)}
+        <tr>
+            <td></td>
+            <td class="batch-comment-content {if $thread.contextual}batch-context{/if}">
+                {call .batchElement}
+                    {param element : $thread.commentBody /}
+                {/call}
+            </td>
+        </tr>
+        {/if}
+        {if isNonnull($thread.actions)}
+            <tr>
+                <td></td>
+                <td>
+                    {call .batchElement}
+                        {param element : $thread.actions /}
+                    {/call}
+                </td>
+            </tr>
+        {/if}
+        {if length($thread.replies) > 0}
+        <tr>
+            <td></td>
+            <td class="batch-comment-split"></td>
+        </tr>
+        {/if}
+        {foreach $reply in $thread.replies}
+            <tr>
+                <td></td>
+                <td>
+                {call .batchCommentPattern}
+                    {param thread : $reply /}
+                {/call}
+                </td>
+            </tr>
+        {/foreach}
+        {if $thread.split == true}
+            <tr>
+                <td class="batch-comment-split"></td>
+                <td class="batch-comment-split"></td>
+            </tr>
+        {/if}
+    </table>
+</td>
+</tr>
+</table>
+{/template}
+
+/**
+ * @param element
+ */
+{template .batchElement private="true"}
+    {switch $element.templateName}
+        {case 'group'}
+            <table class="batch-group" cellspacing="0" cellpadding="0" border="0" width="100%">
+                {foreach $line in $element.lines}
+                    <tr>
+                        <td>
+                        {call .batchElement}
+                            {param element : $line /}
+                        {/call}
+                        </td>
+                    </tr>
+                {/foreach}
+            </table>
+        {case 'line'}
+            <table class="batch-line" cellspacing="0" cellpadding="0" border="0" width="100%">
+                {foreach $elem in $element.elements}
+                    <tr>
+                        <td>
+                        {call .batchElement}
+                            {param element : $elem /}
+                        {/call}
+                        </td>
+                    </tr>
+                {/foreach}
+            </table>
+        {case 'commentPattern'}
+            {call .batchCommentPattern}
+                {param thread : $element /}
+            {/call}
+        {case 'html'}
+            {if isNonnull($element.title)}
+            <table class="batch-html-title">
+                <tr>
+                    <td>
+                        {call .batchElement}
+                            {param element : $element.title /}
+                        {/call}
+                    </td>
+                </tr>
+            </table>
+            {/if}
+            <table class="batch-html {if $element.border}batch-html-border{/if} " cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td>
+                        {call Confluence.Templates.Mail.Content.contentExcerptPattern}
+                            {param contentExcerpt : $element.html/}
+                        {/call}
+                    </td>
+                </tr>
+            </table>
+        {case 'actions'}
+            {call .batchActions}
+                {param actions : itemsForSection($element.contentId, $element.sectionsId, augmentMap($element.context, ['batchTarget' : $ij.batchTarget ])) /}
+            {/call}
+        {case 'lozenge'}
+            <span class="batch-lozenge {$element.status}">{$element.text}</span>
+        {case 'userFullNameList'}
+            {call .batchUserFullnameList}
+                {param userKeys : $element.userKeys/}
+            {/call}
+        {case 'link'}
+            <a href="{if $element.relativeToInstance == true}{baseUrl()}{/if}{$element.link}">{$element.name}</a>
+        {case 'message'}
+            {let $str : getText($element.message)/}
+            {let $args : $element.args /}
+            {call .batchMessage}
+                {param parts: batchMessage(batchMessageMap($str, $args)) /}
+            {/call}
+        {default}
+            {if isNonnull($element)}
+                {$element|noAutoescape}
+            {/if}
+    {/switch}
+
+{/template}
+
+/**
+ * @param section
+ * @param last
+ * @param first
+ */
+{template .batchSection private="true"}
+<table class="batch-section" cellspacing="0" cellpadding="0" border="0" width="100%">
+    {if $last == false or $first ==false}
+    <tr>
+        <td class="batch-section-title">
+            {$section.name}
+        </td>
+    </tr>
+    {/if}
+    <tr>
+        <td class="batch-section-content">
+            {foreach $group in $section.groups}
+                {call .batchElement}
+                    {param element : $group /}
+                {/call}
+            {/foreach}
+        </td>
+    </tr>
+</table>
+{/template}
+
+/**
+ */
+{template .batchCallForAction private="true"}
+    {let $target : $ij.batchTarget.contentId /}
+    {if isNonnull($target)}
+        {let $actionCall : itemsForSection($target, 'email.batch.call.to.action') /}
+        {if isNonnull($actionCall) and length($actionCall) == 1}
+        <table class="batch-section-split" cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+        <table cellspacing="0" cellpadding="0" border="0" width="100%">
+            <tr>
+                <td id="batch-call-action">
+                    {call Confluence.Templates.Mail.Content.primaryButton}
+                        {param buttonLink: webItemLink($actionCall[0])/}
+                        {param buttonText: $actionCall[0].label/}
+                    {/call}
+                </td>
+            </tr>
+        </table>
+    {/if}
+    {/if}
+{/template}
+
+
+/**
+ * @param sections
+ * @param contentType
+ * @param isAuthor
+ */
+{template .batchSummary private="true"}
+    {let $count : $sections[0].count /}
+    {let $size : length($sections) /}
+    {let $summaryKey : 'notifications.batch.summary.' + $contentType + (($isAuthor == true)? '.owner' : '') /}
+    {if $size == 1}
+        {let $summaryValue}
+            <strong class="batch-section-summary">{$sections[0].name}</strong>
+        {/let}
+        <tr>
+            <td id="batch-summary" cellspacing="0" cellpadding="0" border="0">
+                {getText($summaryKey, $summaryValue)|noAutoescape}
+            </td>
+        </tr>
+    {elseif $size > 1}
+        {let $firstData}
+            {foreach $section in $sections}
+                {if not isLast($section)}
+                    {if not isFirst($section)},&nbsp;{/if}
+                    <strong class="batch-section-summary">{$section.name}</strong>
+                {/if}
+            {/foreach}
+        {/let}
+        {let $lastData}<strong class="batch-section-summary">{$sections[$size - 1].name}</strong>{/let}
+
+        {let $summaryValue : getText('notifications.batch.summary.and', $firstData, $lastData) /}
+        <tr>
+            <td id="batch-summary" cellspacing="0" cellpadding="0" border="0">
+                {getText($summaryKey, $summaryValue)|noAutoescape}
+            </td>
+        </tr>
+    {/if}
+{/template}
+
+/**
+ * @param watchType
+ * @param contentId
+ * @param contentLink
+ * @param contentName
+ * @param contentType
+ * @param sections
+ * @param isAuthor
+ * @param replyByEmailEnabled
+ */
+{template .batchTemplate}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.pageTitlePattern}
+            {param titleText: $contentName /}
+            {param contentUrl:  $contentLink /}
+            {param contentType: $contentType /}
+            {param contentIconResourceModule: 'com.atlassian.confluence.plugins.confluence-email-resources:content-type-icons'/}
+            {param contentIconResourceKey: $contentType + '-icon'/}
+        {/call}
+    {/let}
+    {let $batchSections}
+        {foreach $section in $sections}
+            {call .batchSection}
+                {param section : $section /}
+                {param last : isLast($section) /}
+                {param first : isFirst($section) /}
+            {/call}
+            {if not isLast($section)}
+            <table class="batch-section-split" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td></td>
+                </tr>
+            </table>
+            {/if}
+        {/foreach}
+        {call .batchCallForAction}
+        {/call}
+    {/let}
+    {let $replyByEmail}
+        {if $replyByEmailEnabled}
+            <table id="reply-by-email" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                    <td id="footer-call-action">
+                        {getText('confluence.mail.templates.inbound-mail.reply.byline')}
+                    </td>
+                </tr>
+            </table>
+        {/if}
+    {/let}
+
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param htmlHeader}
+            {call Confluence.Templates.Mail.Chrome.htmlHeader}
+                {param additionalCssResources}
+                    {importResource('com.atlassian.confluence.plugins.confluence-email-resources:batch-notification-templates', 'batch-all-clients')}
+                {/param}
+                {param additionalMobileCssResources}
+                    {importResource('com.atlassian.confluence.plugins.confluence-email-resources:batch-notification-templates', 'batch-mobile-clients')}
+                {/param}
+            {/call}
+        {/param}
+        {param header}
+            {call .batchSummary}
+                {param sections : $sections /}
+                {param contentType : $contentType /}
+                {param isAuthor : $isAuthor /}
+            {/call}
+        {/param}
+        {param contentArea : [ $pageTitle , $batchSections , $replyByEmail ] /}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks : itemsForSection($contentId, 'email.adg.footer.links', [ 'watchType' : $watchType ])/}
+            {/call}
+        {/param}
+    {/call}
+{/template}

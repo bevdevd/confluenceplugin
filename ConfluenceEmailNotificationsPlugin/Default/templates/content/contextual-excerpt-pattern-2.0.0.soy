@@ -1,0 +1,42 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Contextual Excerpt Pattern
+ * @param content
+ * @param user
+ * @param? inlineContext
+ */
+{template .contextualExcerptPattern}
+<table class="contextual-excerpt-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td colspan="2" class="contextual-excerpt-pattern-text mobile-resize-text">
+            {getText('confluence.mail.templates.in.reply.to')|noAutoescape}
+        </td>
+    </tr>
+    <tr>
+        <td class="contextual-excerpt-pattern-avatar-container" valign="top">
+            <table>
+                <tr>
+                    <td class="contextual-excerpt-pattern-avatar">
+                        <img class="contextual-excerpt-pattern-avatar-image image_fix" src="{avatarImage($user)}" alt="" title="" height="32" width="32" border="0" />
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td class="contextual-excerpt-pattern-text contextual-excerpt-pattern-text-container mobile-resize-text" valign="top">
+            <strong>{if $user}
+                {$user.fullName}
+            {else}
+                {getText('confluence.mail.templates.anonymous.name')}
+            {/if}</strong>
+            {if $inlineContext}
+                <blockquote><span class="inline-comment-selection-text">{$inlineContext}</span></blockquote>
+            {/if}
+            <div>
+                {call .inlineContentStyles}
+                    {param content: $content/}
+                {/call}
+            </div>
+        </td>
+    </tr>
+</table>
+{/template}

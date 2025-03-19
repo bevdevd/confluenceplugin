@@ -1,0 +1,35 @@
+{namespace Confluence.Templates.Mail.Notifications}
+
+/**
+ * Renders an email notification for page removals.
+ *
+ * @param modifier com.atlassian.confluence.user.ConfluenceUser
+ * @param content com.atlassian.confluence.api.model.content.Content
+ * @param notificationKey com.atlassian.plugin.ModuleCompleteKey
+ * @param watchType com.atlassian.confluence.mail.notification.Notification.WatchType
+ * @param? webFragmentContext a context that is passed to a web fragment.
+ */
+{template .blogPostTrashed}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.contentTitlePattern}
+            {param content: $content/}
+            {param deleted: true/}
+        {/call}
+    {/let}
+
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.trashed.a.blogpost')/}
+                {param user: $modifier/}
+            {/call}
+        {/param}
+        {param contentArea: [$pageTitle]/}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: itemsForSection($content.id, 'email.adg.footer.links', ['notificationKey' : $notificationKey, 'watchType' : $watchType, 'modifier' : $modifier])/}
+            {/call}
+        {/param}
+        {param webFragmentContext: $webFragmentContext/}
+    {/call}
+{/template}

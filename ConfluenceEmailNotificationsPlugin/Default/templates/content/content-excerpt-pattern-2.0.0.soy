@@ -1,0 +1,39 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Content Excerpt Pattern
+ * @param? inlineContext
+ * @param? contentExcerpt
+ * @param? disableAUIStyles
+ * @param? deleted
+ * @param? highlightContent
+ */
+{template .contentExcerptPattern}
+<table class="content-excerpt-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td class="content-excerpt-pattern-container mobile-resize-text {if $deleted}content-deleted-color{/if}">
+        {if $inlineContext}
+            <blockquote><span class="mail-inline-context">{$inlineContext}</span></blockquote>
+        {/if}
+        {if $contentExcerpt}
+            {if $highlightContent}
+                {call Confluence.Templates.Mail.Content.contentHighlight}
+                    {param content}
+                        {if $disableAUIStyles}
+                            {$contentExcerpt|noAutoescape}
+                        {else}
+                            {call .inlineContentStyles}
+                                {param content: attachInlineTaskImages($contentExcerpt)/}
+                            {/call}
+                        {/if}
+                    {/param}
+                {/call}
+            {else}
+                {call .inlineContentStyles}
+                    {param content: attachInlineTaskImages($contentExcerpt)/}
+                {/call}
+            {/if}
+        {/if}
+        </td>
+    </tr>
+</table>
+{/template}

@@ -1,0 +1,14 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+ * Constructs an element for an attached image.
+ *
+ * @param name the name of the attached image
+ * @param? width the width of the image
+ * @param? height the height of the image
+ * @param? title the title of the image
+ * @param? elementStyle additonal CSS styling
+ * @param? elementClass additonal CSS styling
+ */
+{template .attachedImage}
+    <img src="cid:{$name}"{if $title} alt="{$title}" title="{$title}"{/if}{if $width} width="{$width}"{/if}{if $height} height="{$height}"{/if}{if $elementStyle} style="{$elementStyle}"{/if}{if $elementClass} class="{$elementClass}"{/if} border="0" />
+{/template}

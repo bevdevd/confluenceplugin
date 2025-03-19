@@ -216,7 +216,7 @@ public class DirectViewServletFilter implements Filter {
                     throw new Exception("Unknown Content Type");
             }
         } else {    // if neither a pageID, or title parameter exist, then the request doesn't contain any information to identify the content, we should throw an error in this case
-            throw new Exception("No Content Identifier in Request");
+            throw new Exception("Content Identifier in Request");
         }
     }
 

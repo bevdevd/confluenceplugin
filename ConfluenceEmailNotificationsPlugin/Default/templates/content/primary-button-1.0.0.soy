@@ -1,0 +1,15 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+* Primary aui button
+* @param buttonLink
+* @param buttonText
+*/
+{template .primaryButton}
+    <table cellspacing="0" cellpadding="0" border="0" class="aui-button-email-container">
+        <tr>
+            <td class="aui-button-email">
+                <a href="{$buttonLink}" class="aui-button-email-link">{$buttonText}</a>
+            </td>
+        </tr>
+    </table>
+{/template}
