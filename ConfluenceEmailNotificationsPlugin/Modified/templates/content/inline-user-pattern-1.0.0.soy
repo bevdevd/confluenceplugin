@@ -1,0 +1,18 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Inline User Pattern
+ * @param actionString
+ * @param avatarImage
+ * @param user
+ */
+{template .inlineUserPattern}
+{natto(['soy-template-file-name' : 'inline-user-pattern-1.0.0.soy', 'deprecate-in-version' : '5.5', 'remove-in-version' : '6.2'], 'The [inlineUserPattern] template has been changed to use the given user object to derive the user\'s avatar via [com.atlassian.confluence.plugins.email.soy.UserAvatarImageFunction] in [inline-user-pattern-2.0.0.soy].')}
+<span id="inline-user-pattern" class="mobile-resize-text">
+    {$actionString}&nbsp;
+    <img id="inline-user-pattern-avatar-image" src="cid:{$avatarImage}" width="16" height="16"/>&nbsp;
+    {call Confluence.Templates.Mail.Utils.userLink}
+        {param user: $user/}
+        {param linkTextHtml}{$user.fullName}{/param}
+    {/call}
+</span>
+{/template}

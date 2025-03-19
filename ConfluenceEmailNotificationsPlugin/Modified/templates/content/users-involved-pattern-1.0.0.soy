@@ -1,0 +1,74 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Users Involved Pattern
+ * @param actionString
+ * @param users
+ * @param? emails
+ * @param? names
+ * @param? after
+ */
+{template .usersInvolvedPattern}
+<table id="users-involved-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td id="users-involved-pattern-container-top" class="users-involved-pattern-content mobile-resize-text" valign="middle">
+            {$actionString|noAutoescape}
+        </td>
+    </tr>
+    <tr>
+        <td id="users-involved-pattern-container" class="users-involved-pattern-content mobile-resize-text" valign="middle">
+
+            {let $totalUsers: $users ? length($users) : 0/}
+            {let $totalEmails: $emails ? length($emails) : 0/}
+            {let $totalNames: $names ? length($names) : 0/}
+            {let $totalInvolved: $totalUsers + $totalEmails + $totalNames /}
+
+            {foreach $user in $users}
+                {call Confluence.Templates.Mail.Utils.avatarNameTableColumn}
+                    {param avatarCid: $user.value/}
+                    {param displayNameHtml}
+                        {call Confluence.Templates.Mail.Utils.userLink}
+                            {param user: $user.key/}
+                            {param linkTextHtml}{$user.key.fullName}{/param}
+                        {/call}
+                    {/param}
+                    {param totalInvolved: $totalInvolved/}
+                    {param currentIndex: index($user)/}
+                {/call}
+            {/foreach}
+
+            {if $emails}
+                {foreach $email in $emails}
+                    {call Confluence.Templates.Mail.Utils.avatarNameTableColumn}
+                        {param avatarCid: $email.value/}
+                        {param displayNameHtml}
+                            {call Confluence.Templates.Mail.Utils.anonymousUserLink}
+                                {param email}{$email.key}{/param}
+                            {/call}
+                        {/param}
+                        {param totalInvolved: $totalInvolved/}
+                        {param currentIndex: $totalUsers + index($email)/}
+                    {/call}
+                {/foreach}
+            {/if}
+
+            {if $names}
+                {foreach $name in $names}
+                    {call Confluence.Templates.Mail.Utils.avatarNameTableColumn}
+                        {param avatarCid: $name.value/}
+                        {param displayNameHtml}{$name.key}{/param}
+                        {param totalInvolved: $totalInvolved/}
+                        {param currentIndex: $totalUsers + $totalEmails + index($name)/}
+                    {/call}
+                {/foreach}
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td id="users-involved-pattern-container-bottom" class="users-involved-pattern-content mobile-resize-text" valign="middle">
+            {if $after}
+                {$after|noAutoescape}
+            {/if}
+        </td>
+    </tr>
+</table>
+{/template}

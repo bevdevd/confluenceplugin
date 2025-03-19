@@ -1,0 +1,64 @@
+{namespace Confluence.Templates.Mail.Chrome}
+/**
+ * Main template used by ADG Notification. Includes a table that contains all content and consists of four
+ * distinct notification areas: header, contentArea, contextualArea and footer
+ * @param? header the header of the notification, contains an avatar,username and the action the notification pertains to
+ * @param contentArea the main body of the notification, contains notification contents
+ * @param? contextualArea additional meta data related to a given notification
+ * @param footer the notification footer, containing some management links, information and logos
+ * @param? htmlHeader the HTML header of the email (<head>...</head>), will just use .htmlHeader if none is provided
+ * @param? centerContent center the content with a max width
+ * @param? class a class appended to the main container table to help target CSS
+ * @param? webFragmentContext a map made available to web-panels and items; see NotificationContext.WEB_FRAGMENT_CONTEXT
+ */
+{template .mainTable}
+{if $htmlHeader}
+    {$htmlHeader|noAutoescape}
+{else}
+    {call .htmlHeader/}
+{/if}
+<body>
+
+{debugOutput('<div style=\"border: 1px solid #FF0080; padding: 0px; margin: 0px; width: auto;\">')|noAutoescape}
+
+<table id="background-table" {if $class}class="{$class}"{/if} cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td>
+            <h2>You have new notifications on Confluence</h2>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p>Press <a href="http://localhost:1990/confluence/#all-updates">here</a> to view all page updates, or check your notifications to see any mentions</p>
+        </td>
+    </tr>
+</table>
+
+{if $centerContent}
+{/if}
+{if $header}
+{/if}
+{if $contentArea}
+{/if}
+{if $contextualArea}
+{/if}
+{if $footer}
+{/if}
+{if $centerContent}
+{/if}
+
+{debugOutput('</div>')|noAutoescape}
+/* Hidden elements can be used for tracking and mail-client filtering */
+<table id="sealed-section" border="0" cellpadding="0" cellspacing="0" width="0">
+    <tr>
+        <td>
+            {call Confluence.Templates.Mail.Utils.renderWebPanels}
+                {param location: 'atl.email.hidden.panel'/}
+                {param context: $webFragmentContext/}
+            {/call}
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+{/template}

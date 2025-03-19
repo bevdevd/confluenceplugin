@@ -1,0 +1,47 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+  * Page Title Pattern
+  * @param contentType
+  * @param titleText
+  * @param? pageTitleInlinePattern
+  * @param? contentUrl
+  * @param? deleted
+  */
+{template .pageTitlePattern}
+{natto(['soy-template-file-name' : 'page-title-pattern-1.0.0.soy', 'deprecate-in-version' : '5.5', 'remove-in-version' : '6.2'], 'The [pageTitlePattern] template has been changed to source the content icon image directly instead of by convention in [page-title-pattern-2.0.0.soy].')}
+<table id="page-title-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    /* email header goes in this row */
+    <tr>
+        /* 16x16 icon representing email type goes in this cell */
+        <td id="page-title-pattern-icon-image-container" valign="top">
+            <table cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                    <td id="page-title-pattern-icon-image-container-cell">
+                        <a {if $contentUrl}href="{sourceLink($contentUrl)}" {/if} title="{$contentType} icon" style="vertical-align: top;">
+                            <img style="vertical-align: top; display: block;" src="cid:{$contentType}-icon" alt="{$contentType} icon" title="{$contentType} icon" height="16" width="16" border="0" />
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+        /* email title goes in this h2 tag */
+        <td style="vertical-align: top;" id="page-title-pattern-header-container">
+            <span id="page-title-pattern-header" {if $deleted}class="content-deleted-color"{/if}>
+                {if $contentUrl}
+                    <a href="{sourceLink($contentUrl)}" title="{$titleText}">{$titleText}</a>
+                {else}
+                    {$titleText}
+                {/if}
+            </span>
+            {if $deleted}
+                &nbsp;
+                {call Confluence.Templates.Mail.Content.contentDeletedLozengePattern/}
+            {/if}
+            {if $pageTitleInlinePattern}
+                &nbsp;
+                {$pageTitleInlinePattern|noAutoescape}
+            {/if}
+        </td>
+    </tr>
+</table>
+{/template}

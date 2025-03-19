@@ -1,0 +1,25 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+  * Page Title Pattern
+  * @param statusHtml
+  */
+{template .statusUpdatePattern}
+<table id="status-update-pattern" cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td id="status-update-pattern-icon-container" valign="top">
+            <table>
+                <tr>
+                    <td id="page-link-pattern-icon">
+                        <img id="status-update-pattern-icon-image" class="image_fix"
+                             src="{resourceImage('com.atlassian.confluence.plugins.confluence-email-resources:content-type-icons', 'status-icon')}"
+                             alt="status icon" title="status icon" height="16" width="16" border="0" />
+                   </td>
+                </tr>
+            </table>
+        </td>
+        <td id="status-update-pattern-text" valign="middle" class="mobile-resize-text">
+            {$statusHtml|noAutoescape}
+        </td>
+    </tr>
+</table>
+{/template}

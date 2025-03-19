@@ -1,0 +1,42 @@
+{namespace Confluence.Templates.Mail.Notifications}
+/**
+ * Content removed email, for when attachments are removed.
+ * @param avatarCid
+ * @param remover
+ * @param contentType
+ * @param page
+ * @param attachments
+ * @param footerLinks
+ */
+{template .contentRemoved}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.pageTitlePattern}
+            {param contentType: $contentType/}
+            {param titleText: $page.title/}
+            {param contentUrl}
+                {baseUrl()}{$page.urlPath}
+            {/param}
+        {/call}
+    {/let}
+    {let $contentRemoved}
+        {call Confluence.Templates.Mail.Content.contentAddedPattern}
+            {param attachments: $attachments/}
+            {param deleted: true /}
+        {/call}
+    {/let}
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.removed.file')/}
+                {param avatarImage: $avatarCid/}
+                {param user: $remover/}
+            {/call}
+        {/param}
+        {param contentArea: [$pageTitle, $contentRemoved]/}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: $footerLinks/}
+            {/call}
+        {/param}
+    {/call}
+{/template}

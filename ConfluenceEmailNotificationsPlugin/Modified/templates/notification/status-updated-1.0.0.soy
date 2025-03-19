@@ -1,0 +1,29 @@
+{namespace Confluence.Templates.Mail.Notifications}
+/**
+* @param modifier
+* @param avatarCid
+* @param renderedContentHtml
+* @param footerLinks
+*/
+{template .statusUpdated}
+    {let $status}
+        {call Confluence.Templates.Mail.Content.statusUpdatePattern}
+            {param statusHtml: $renderedContentHtml/}
+        {/call}
+    {/let}
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.status.updated')/}
+                {param avatarImage: $avatarCid/}
+                {param user: $modifier/}
+            {/call}
+        {/param}
+        {param contentArea: [$status]/}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: $footerLinks/}
+            {/call}
+        {/param}
+    {/call}
+{/template}

@@ -1,0 +1,56 @@
+{namespace Confluence.Templates.Mail.Notifications}
+/**
+ * @param avatarCid
+ * @param modifier
+ * @param contentType
+ * @param content
+ * @param commentHtml
+ * @param? parentCommentHtml
+ * @param? parentUser
+ * @param? parentAvatar
+ * @param footerLinks
+ * @param? inlineContext
+ */
+{template .commentRemove}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.pageTitlePattern}
+            {param contentType: $contentType/}
+            {param titleText: $content.displayTitle/}
+            {param contentUrl}
+                {baseUrl()}{$content.urlPath}
+            {/param}
+            {param deleted: true/}
+        {/call}
+    {/let}
+    {let $contentExcerpt}
+        {call Confluence.Templates.Mail.Content.contentExcerptPattern}
+            {param contentExcerpt: $commentHtml/}
+            {param deleted: true/}
+            {param inlineContext: $inlineContext/}
+        {/call}
+    {/let}
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.deleted.a.comment')/}
+                {param avatarImage: $avatarCid/}
+                {param user: $modifier/}
+            {/call}
+        {/param}
+        {param contentArea: [$pageTitle, $contentExcerpt]/}
+        {param contextualArea}
+            {if $parentCommentHtml}
+                {call Confluence.Templates.Mail.Content.contextualExcerptPattern}
+                    {param content: $parentCommentHtml/}
+                    {param user: $parentUser/}
+                    {param avatar: $parentAvatar/}
+                {/call}
+            {/if}
+        {/param}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: $footerLinks/}
+            {/call}
+        {/param}
+    {/call}
+{/template}

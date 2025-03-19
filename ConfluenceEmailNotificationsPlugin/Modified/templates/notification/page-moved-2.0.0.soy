@@ -1,0 +1,42 @@
+{namespace Confluence.Templates.Mail.Notifications}
+/**
+ * @param modifier com.atlassian.confluence.user.ConfluenceUser
+ * @param content com.atlassian.confluence.api.model.content.Content
+ * @param oldSpace com.atlassian.confluence.api.model.content.Space
+ * @param? oldParentPage com.atlassian.confluence.api.model.content.Content
+ * @param space com.atlassian.confluence.api.model.content.Space
+ * @param? movedChildPages Iterable<com.atlassian.confluence.api.model.content.Content>
+ * @param watchType com.atlassian.confluence.mail.notification.Notification.WatchType
+ * @param notificationKey com.atlassian.plugin.ModuleCompleteKey
+ * @param currentParentPage com.atlassian.confluence.api.model.content.Content
+ */
+{template .pageMoved}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.contentTitlePattern}
+            {param content: $content/}
+        {/call}
+    {/let}
+    {let $contentExcerpt}
+        {call Confluence.Templates.Mail.Content.movePagePattern}
+            {param oldSpace: $oldSpace /}
+            {param oldParentPage: $oldParentPage /}
+            {param currentParentPage: $currentParentPage /}
+            {param space: $space /}
+            {param movedChildPages: $movedChildPages /}
+        {/call}
+    {/let}
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.moved.a.page')/}
+                {param user: $modifier/}
+            {/call}
+        {/param}
+        {param contentArea: [$pageTitle, $contentExcerpt]/}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: itemsForSection($content.id, 'email.adg.footer.links', ['notificationKey' : $notificationKey, 'watchType' : $watchType, 'modifier' : $modifier])/}
+            {/call}
+        {/param}
+    {/call}
+{/template}

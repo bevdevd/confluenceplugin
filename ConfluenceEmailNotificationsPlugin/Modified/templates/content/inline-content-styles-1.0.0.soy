@@ -1,0 +1,10 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Pattern for injecting AUI styles
+ * @param content
+ */
+{template .inlineContentStyles}
+    {injectCssInline($content, [
+        'com.atlassian.confluence.plugins.confluence-email-resources' : ['chrome-template' : ['aui-styles.css']]
+    ])|noAutoescape}
+{/template}

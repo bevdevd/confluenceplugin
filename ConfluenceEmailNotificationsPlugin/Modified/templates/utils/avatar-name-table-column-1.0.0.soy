@@ -1,0 +1,48 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+* @param avatarCid
+* @param displayNameHtml
+* @param totalInvolved
+* @param currentIndex
+*
+* This template displays a table of users and avatars using the following rules
+* If 5 or less users are present, they are all displayed in a single columns
+* If more than 5 users are present, they are evenly distributed among 3 columns
+* with a 60px gutter between each column
+*/
+{template .avatarNameTableColumn}
+    {let $numberOfColumns: 3 /}
+    {let $maxUsersInSingleColumn: 5 /}
+    {let $usersPerColumn: floor($totalInvolved / $numberOfColumns) /}
+    {let $usersInRowOne:  (($totalInvolved % $numberOfColumns > 0) ? 1 : 0) + $usersPerColumn /}
+    {let $usersInRowTwo: (($totalInvolved % $numberOfColumns > 1) ? 1 : 0) + $usersPerColumn /}
+    {let $usersInRowThree: $usersPerColumn /}
+    {let $useMultipleColumns: $totalInvolved > $maxUsersInSingleColumn /}
+
+    {if $currentIndex == 0}
+        <table class="users-involved-pattern-column-table {if not $useMultipleColumns}no-right-padding{/if}" {if $useMultipleColumns}align="left"{/if}>
+            <tr>
+                <td class="users-involved-pattern-column-container">{call .avatarNameTable data="all"/}
+        {if $totalInvolved == 1}
+                </td>
+            </tr>
+        </table>
+        {/if}
+    {elseif $currentIndex == $totalInvolved - 1}
+                {call .avatarNameTable data="all"/}
+                </td>
+            </tr>
+        </table>
+    {else}
+        {if $useMultipleColumns and ($currentIndex == $usersInRowOne or $currentIndex == ($usersInRowOne + $usersInRowTwo))}
+                    </td>
+                </tr>
+            </table>
+            <table class="users-involved-pattern-column-table {if $currentIndex == ($usersInRowOne + $usersInRowTwo)}no-right-padding{/if}" {if $currentIndex < ($usersInRowOne + $usersInRowTwo)}align="left"{/if}>
+                <tr>
+                    <td class="users-involved-pattern-column-container">{call .avatarNameTable data="all"/}
+        {else}
+            {call .avatarNameTable data="all"/}
+        {/if}
+    {/if}
+{/template}

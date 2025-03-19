@@ -1,0 +1,25 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+* @param avatarCid
+* @param displayNameHtml
+*
+* This template contains a user avatar image alongside a user name
+*/
+{template .avatarNameTable}
+    <table class="mobile-resize-text" valign="middle">
+        <tr>
+            <td class="users-involved-pattern-avatar-container">
+                <table class="users-involved-pattern-avatar-table">
+                    <tr>
+                        <td class="users-involved-pattern-avatar-table-cell">
+                            <img src="cid:{$avatarCid}" width="16" height="16" class="users-involved-pattern-avatar-image" />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class="users-involved-pattern-name-container mobile-resize-text">
+                 {$displayNameHtml |noAutoescape}
+            </td>
+        </tr>
+    </table>
+{/template}

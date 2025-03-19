@@ -1,0 +1,14 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+ * Render web-panels. This allows plugins to add custom content to locations in the email.
+
+ * @param location the web-panel location to render
+ * @param? context the context passed to the panels
+ */
+{template .renderWebPanels}
+    {if $context}
+        {foreach $webPanelHtml in getWebPanels($location, $context)}
+            {$webPanelHtml|noAutoescape}
+        {/foreach}
+    {/if}
+{/template}

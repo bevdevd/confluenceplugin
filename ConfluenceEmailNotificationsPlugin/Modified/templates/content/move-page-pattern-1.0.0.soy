@@ -1,0 +1,68 @@
+{namespace Confluence.Templates.Mail.Content}
+/**
+ * Move Page pattern
+ * @param oldSpace
+ * @param? oldParentPage
+ * @param space
+ * @param content
+ * @param? movedChildPages
+ */
+{template .movePagePattern}
+{natto(['soy-template-file-name' : 'move-page-pattern-1.0.0.soy', 'deprecate-in-version' : '5.5', 'remove-in-version' : '6.2'], 'The [movePagePattern] template has been changed to source the space logo and page icon image directly instead of by convention in [move-page-pattern-2.0.0.soy].')}
+<table id="move-page-pattern" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td class="move-page-pattern-label">{getText('confluence.mail.templates.move.from')}</td>
+        <td class="move-page-pattern-icon-container">
+            <img class="move-page-pattern-icon-image image_fix" src="cid:{$oldSpace.key}-space-logo"
+                 alt="{$oldSpace.name} logo" title="{$oldSpace.name} logo" height="32" width="32" border="0"/>
+        </td>
+        <td class="move-page-pattern-text-container" width="100%">
+            <a href="{sourceLink(baseUrl() + '/display/' + $oldSpace.key)}">{$oldSpace.name}</a>
+            {if $oldParentPage}
+            &nbsp;/&nbsp;<a href="{sourceLink(baseUrl() + $oldParentPage.urlPath)}">{$oldParentPage.title}</a>
+            {/if}
+        </td>
+    </tr>
+    <tr>
+        <td class="move-page-pattern-label">{getText('confluence.mail.templates.move.to')}</td>
+        <td class="move-page-pattern-icon-container">
+            <img class="move-page-pattern-icon-image image_fix" src="cid:{$space.key}-space-logo" alt="{$space.name} logo" title="{$space.name} logo" height="32" width="32" border="0"/>
+        </td>
+        <td class="move-page-pattern-text-container" width="100%">
+            <a href="{sourceLink(baseUrl() + '/display/' + $space.key)}">{$space.name}</a>
+            {if $content.parent}
+                &nbsp;/&nbsp;<a href="{sourceLink(baseUrl() + $content.parent.urlPath)}">{$content.parent.title}</a>
+            {/if}
+        </td>
+    </tr>
+
+    {if $movedChildPages}
+        /* Children moved stuff (can be hidden) */
+        <tr height="10">
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td class="move-page-pattern-label children">
+                {getText('confluence.mail.templates.move.children')}
+            </td>
+            <td colspan="2" width="100%">
+                <table id="move-page-children-pattern" cellspacing="0" cellpadding="0" border="0">
+                {foreach $childPage in $movedChildPages}
+                    <tr>
+                        <td class="move-page-pattern-icon-container children">
+                            <img class="move-children-pattern-icon-image image_fix" src="cid:page-icon" alt="" title="" height="16" width="16" border="0"  />
+                        </td>
+                        <td class="move-page-pattern-text-container">
+                            {$childPage.title}
+                        </td>
+                    </tr>
+                {/foreach}
+                </table>
+            </td>
+        </tr>
+
+    {/if}
+</table>
+{/template}

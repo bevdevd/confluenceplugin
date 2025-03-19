@@ -1,0 +1,338 @@
+/**
+ * TYPOGRAPHY - 14px base font size, agnostic font stack
+ * auiplugin-5.1-m5 24/04/2013
+ */
+body {
+    color: #333;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.42857142857143; /* 20px equiv line-height */
+}
+
+/* International Font Stacks*/
+:lang(en),
+[lang=en] {
+    font-family: Arial, sans-serif;
+}
+
+:lang(ja),
+[lang=ja] {
+    font-family: "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", "メイリオ", Meiryo, "ＭＳ Ｐゴシック", Verdana, Arial, sans-serif;
+}
+
+/* Default margins */
+p,
+ul,
+ol,
+dl,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+blockquote,
+pre,
+form.aui,
+table.aui,
+.aui-tabs,
+.aui-panel,
+.aui-group {
+    margin: 10px 0 0 0;
+}
+
+/* No top margin to interfere with box padding */
+p:first-child,
+ul:first-child,
+ol:first-child,
+dl:first-child,
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child,
+h6:first-child,
+blockquote:first-child,
+pre:first-child,
+form.aui:first-child,
+table.aui:first-child,
+.aui-tabs:first-child,
+.aui-panel:first-child,
+.aui-group:first-child {
+    margin-top: 0;
+}
+
+ul.inline-task-list {
+    padding: 18px 0 0 0;
+}
+
+/* Headings */
+h1 {
+    font-size: 24px;
+    font-weight: normal;
+    line-height: 30px;
+    margin: 40px 0 0 0;
+}
+
+h2 {
+    font-size: 20px;
+    font-weight: normal;
+    line-height: 30px;
+    margin: 40px 0 0 0;
+}
+
+h3 {
+    font-size: 16px;
+    line-height: 25px;
+    margin: 30px 0 0 0;
+}
+
+h4 {
+    font-size: 14px;
+    line-height: 20px;
+    margin: 20px 0 0 0;
+}
+
+h5 {
+    color: #707070;
+    font-size: 14px;
+    line-height: 20px;
+    margin: 20px 0 0 0;
+}
+
+h6 {
+    color: #707070;
+    font-size: 12px;
+    line-height: 20px;
+    margin: 20px 0 0 0;
+}
+
+h1:first-child,
+h2:first-child,
+h3:first-child,
+h4:first-child,
+h5:first-child,
+h6:first-child {
+    margin-top: 0;
+}
+
+/* Nice styles for using subheadings */
+h1 + h2,
+h2 + h3,
+h3 + h4,
+h4 + h5,
+h5 + h6 {
+    margin-top: 10px;
+}
+
+/* Increase the margins on all headings when used in the group/item pattern ... */
+.aui-group > .aui-item > h1:first-child,
+.aui-group > .aui-item > h2:first-child,
+.aui-group > .aui-item > h3:first-child,
+.aui-group > .aui-item > h4:first-child,
+.aui-group > .aui-item > h5:first-child,
+.aui-group > .aui-item > h6:first-child {
+    margin-top: 20px;
+}
+
+/* ... unless they're the first-child */
+.aui-group:first-child > .aui-item > h1:first-child,
+.aui-group:first-child > .aui-item > h2:first-child,
+.aui-group:first-child > .aui-item > h3:first-child,
+.aui-group:first-child > .aui-item > h4:first-child,
+.aui-group:first-child > .aui-item > h5:first-child,
+.aui-group:first-child > .aui-item > h6:first-child {
+    margin-top: 0;
+}
+
+/* Other typographical elements */
+small {
+    color: #707070;
+    font-size: 12px;
+    line-height: 1.33333333333333; /* 16px equiv line-height */
+}
+
+code,
+kbd {
+    font-family: monospace;
+}
+
+var,
+address,
+dfn,
+cite {
+    font-style: italic;
+}
+
+cite:before {
+    content: "\2014 \2009";
+}
+
+blockquote {
+    border-left: 1px solid #ccc;
+    color: #707070;
+    margin-left: 19px;
+    padding: 10px 20px;
+}
+
+blockquote > cite {
+    display: block;
+    margin-top: 10px;
+}
+
+q {
+    color: #707070;
+}
+
+q:before {
+    content: open-quote;
+}
+
+q:after {
+    content: close-quote;
+}
+
+abbr {
+    border-bottom: 1px #707070 dotted;
+    cursor: help;
+}
+
+/*
+ * AUI Buttons - minimal styles needed for aui-buttons for non-outlook. This is to catch buttons that appear in content
+ * Note: gradients have been inlined as botocss dies on browser specific rules
+ */
+
+.aui-button {
+    background: #f2f2f2;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: #333;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-variant: normal;
+    font-weight: normal;
+    line-height: 1.4285714285714;
+    margin: 0;
+    padding: 4px 10px;
+    text-decoration: none;
+    text-shadow: 0 1px 0 white;
+    vertical-align: baseline;
+    white-space: nowrap;
+}
+
+.aui-button.aui-button-primary {
+    background: #3068a2;
+    border-color: #486582;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 0 1px 0 #205081;
+}
+
+/* For the JIRA Issue Macro */
+.jira-issue,
+.single-issue-oauth {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 0 2px;
+    border-radius: 3px;
+    display: inline-block;
+    line-height: 14px;
+    mso-line-height-rule: exactly;
+}
+
+.jira-issue img {
+    vertical-align: text-bottom;
+    border: 0px; /* because IE likes putting borders around linked images*/
+}
+
+.aui-lozenge {
+    background: #ccc;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    color: #333;
+    display: inline-block;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 14px;
+    margin: 0;
+    padding: 0 5px;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    mso-line-height-rule: exactly;
+}
+
+.aui-lozenge.aui-lozenge-subtle {
+    background-color: #fff;
+    border-color: #ccc;
+    color: #333;
+}
+
+.aui-lozenge-success {
+    background-color: #14892c;
+    border-color: #14892c;
+    color: #fff;
+}
+
+.aui-lozenge-success.aui-lozenge-subtle {
+    background-color: #fff;
+    border-color: #b2d8b9;
+    color: #14892c;
+}
+
+.aui-lozenge-error {
+    background-color: #d04437;
+    border-color: #d04437;
+    color: #fff;
+}
+
+.aui-lozenge-error.aui-lozenge-subtle {
+    background-color: #fff;
+    border-color: #f8d3d1;
+    color: #d04437;
+}
+
+.aui-lozenge-current {
+    background-color: #ffd351;
+    border-color: #ffd351;
+    color: #594300;
+}
+
+.aui-lozenge-current.aui-lozenge-subtle {
+    background-color: #fff;
+    border-color: #ffe28c;
+    color: #594300;
+}
+
+.aui-lozenge-complete {
+    background-color: #4a6785;
+    border-color: #4a6785;
+    color: #fff;
+}
+
+.aui-lozenge-complete.aui-lozenge-subtle {
+    background-color: #fff;
+    border-color: #e4e8ed;
+    color: #4a6785;
+}
+
+.aui-lozenge-moved {
+    background-color: #815b3a;
+    border-color: #815b3a;
+    color: #fff;
+}
+
+.aui-lozenge-moved.aui-lozenge-subtle {
+    background-color: #fff;
+    border-color: #ece7e2;
+    color: #815b3a;
+}
+
+img.emoticon {
+    vertical-align: middle;
+    width: 16px;
+    height: 16px;
+}

@@ -1,0 +1,47 @@
+Manifest-Version: 1.0
+Created-By: Apache Maven Bundle Plugin
+Built-By: root
+Build-Jdk: 11.0.20.1
+Atlassian-Build-Date: 2023-11-16T11:14:02+0000
+Bnd-LastModified: 1700133242272
+Bundle-Description: Provides resources and web fragments for Confluence 
+ Notification emails.
+Bundle-DocURL: http://www.atlassian.com/
+Bundle-License: http://www.atlassian.com/end-user-agreement/
+Bundle-ManifestVersion: 2
+Bundle-Name: Confluence Email Notifications Plugin
+Bundle-SymbolicName: com.atlassian.confluence.plugins.confluence-email-n
+ otifications-plugin
+Bundle-Vendor: Atlassian
+Bundle-Version: 18.5.15
+Import-Package: com.atlassian.confluence.notifications,com.atlassian.plu
+ gin.notifications.api.medium,com.atlassian.plugin.notifications.api.mac
+ ros,com.atlassian.plugin.notifications.api.notification,com.atlassian.b
+ otocss,com.atlassian.confluence.api.model.content,com.atlassian.conflue
+ nce.api.model.content.id,com.atlassian.confluence.api.model.link,com.at
+ lassian.confluence.cluster,com.atlassian.confluence.core,com.atlassian.
+ confluence.event.events.content,com.atlassian.confluence.event.events.c
+ ontent.attachment,com.atlassian.confluence.event.events.content.blogpos
+ t,com.atlassian.confluence.event.events.content.comment,com.atlassian.c
+ onfluence.event.events.content.page,com.atlassian.confluence.event.even
+ ts.like,com.atlassian.confluence.event.events.types,com.atlassian.confl
+ uence.jmx,com.atlassian.confluence.languages,com.atlassian.confluence.m
+ ail,com.atlassian.confluence.mail.embed,com.atlassian.confluence.mail.n
+ otification,com.atlassian.confluence.mail.template,com.atlassian.conflu
+ ence.pages,com.atlassian.confluence.plugin.descriptor.mail,com.atlassia
+ n.confluence.plugin.descriptor.mail.conditions,com.atlassian.confluence
+ .plugins.lookandfeel,com.atlassian.confluence.spaces,com.atlassian.conf
+ luence.user,com.atlassian.confluence.util.collections,com.atlassian.con
+ fluence.util.i18n,com.atlassian.event,com.atlassian.fugue,com.atlassian
+ .mail,com.atlassian.mail.server,com.atlassian.plugin,com.atlassian.plug
+ in.notifications.api,com.atlassian.plugin.util,com.atlassian.sal.api,co
+ m.atlassian.sal.api.message,com.atlassian.sal.api.transaction,com.atlas
+ sian.sal.api.user,com.atlassian.soy.renderer,com.atlassian.templaterend
+ erer,com.atlassian.user,com.google.common.base,com.google.common.collec
+ t,com.google.common.hash,javax.activation,javax.annotation,javax.mail,o
+ rg.apache.commons.lang3,org.osgi.framework,org.slf4j,org.springframewor
+ k.beans.factory.annotation,com.atlassian.plugin.notifications.api.mediu
+ m.recipient,com.atlassian.confluence.notifications.batch.service,com.at
+ lassian.confluence.notifications.impl.conditions
+Tool: Bnd-3.5.0.201709291849
+

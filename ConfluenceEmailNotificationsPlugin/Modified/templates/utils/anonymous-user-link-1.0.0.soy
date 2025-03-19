@@ -1,0 +1,8 @@
+{namespace Confluence.Templates.Mail.Utils}
+/**
+* Creates a link to the specified email
+* @param email
+*/
+{template .anonymousUserLink}
+    <a href="mailto:{$email}" title="{$email}">{$email}</a>
+{/template}

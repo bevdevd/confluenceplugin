@@ -1,0 +1,37 @@
+{namespace Confluence.Templates.Mail.Notifications}
+/**
+ * Content added email which is dispatched when somebody adds attachments to a page
+ * @param modifier com.atlassian.confluence.user.ConfluenceUser
+ * @param page     com.atlassian.confluence.api.model.content.Content
+ * @param attachments List<com.atlassian.confluence.api.model.content.Content>
+ * @param notificationKey com.atlassian.plugin.ModuleCompleteKey
+ * @param watchType com.atlassian.confluence.mail.notification.Notification.WatchType
+ * @param? webFragmentContext a context that is passed to a web fragment.
+ */
+{template .contentAdded}
+    {let $pageTitle}
+        {call Confluence.Templates.Mail.Content.contentTitlePattern}
+            {param content: $page/}
+        {/call}
+    {/let}
+    {let $contentAdded}
+        {call Confluence.Templates.Mail.Content.contentCreatedPattern}
+            {param attachments: $attachments/}
+        {/call}
+    {/let}
+    {call Confluence.Templates.Mail.Chrome.mainTable}
+        {param header}
+            {call Confluence.Templates.Mail.Chrome.headerPattern}
+                {param actionString: getText('confluence.mail.templates.added.files', length($attachments))/}
+                {param user: $modifier/}
+            {/call}
+        {/param}
+        {param contentArea: [$pageTitle, $contentAdded]/}
+        {param footer}
+            {call Confluence.Templates.Mail.Chrome.footerPattern}
+                {param footerLinks: itemsForSection($page.id, 'email.adg.footer.links', ['notificationKey' : $notificationKey, 'watchType' : $watchType, 'modifier' : $modifier])/}
+            {/call}
+        {/param}
+        {param webFragmentContext: $webFragmentContext/}
+    {/call}
+{/template}

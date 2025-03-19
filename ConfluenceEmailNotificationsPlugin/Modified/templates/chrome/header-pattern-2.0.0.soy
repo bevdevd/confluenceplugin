@@ -1,0 +1,33 @@
+{namespace Confluence.Templates.Mail.Chrome}
+/**
+ * Header
+ * @param actionString
+ * @param user com.atlassian.confluence.user.ConfluenceUser
+ */
+{template .headerPattern}
+<tr>
+    <td id="header-pattern-container">
+        <table id="header-pattern" cellspacing="0" cellpadding="0" border="0">
+            <tr>
+                <td id="header-avatar-image-container" valign="top">
+                    {call Confluence.Templates.Mail.Utils.userLink}
+                        {param user: $user/}
+                        {param linkTextHtml}
+                            <img id="header-avatar-image" class="image_fix" src="{avatarImage($user)}" height="32" width="32" border="0" />
+                        {/param}
+                    {/call}
+                </td>
+                <td id="header-text-container" valign="middle">
+                    {if $user}
+                        {$user.fullName}
+                    {else}
+                        {getText('confluence.mail.templates.anonymous.name')}
+                    {/if}
+                    {sp}{$actionString|noAutoescape}
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>
+<!-- End Header pattern -->
+{/template}
