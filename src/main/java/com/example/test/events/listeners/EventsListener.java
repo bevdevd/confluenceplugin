@@ -63,7 +63,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections; 
+import java.util.Arrays;
 import java.util.List;
 import java.lang.ThreadLocal;
 /* END UTILITY IMPORTS */
@@ -97,7 +97,7 @@ import com.atlassian.confluence.event.events.user.UserDeactivateEvent;
 /* END EVENT IMPORTS */
 
 @Named
-public class NotificationsListener implements InitializingBean, DisposableBean {
+public class EventsListener implements InitializingBean, DisposableBean {
 
     /* Essential Setup */
     @ConfluenceImport
@@ -118,14 +118,14 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
     private final SpaceService spaceService;
 
     private static final ModuleCompleteKey PERMISSIONS_KEY =    new ModuleCompleteKey("com.plugins.permissions.listener", "confluence-permissions");
-    private static final Logger log = LoggerFactory.getLogger(NotificationsListener.class);
+    private static final Logger log = LoggerFactory.getLogger(EventsListener.class);
 
     private Boolean isSpaceWatchEvent = false;
 
     private Utilities utilities;
 
     @Inject
-    public NotificationsListener (
+    public EventsListener (
         EventPublisher eventPublisher,
         ContentService contentService,
         NotificationManager notificationManager,
@@ -163,6 +163,60 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
         eventPublisher.unregister(this);
     }
     /* End Essential Setup */
+
+    /* ---+++=== PERMISSIONS PROCESSING ===+++--- */
+    public void updateSpacePermissions(Space space) {
+        System.out.println("--------++++++++======== CHECKING PERMISSION GROUPS ========++++++++--------");
+        List<SpacePermission> spacePermissions = space.getPermissions();
+
+        // Replace with the restriction/class level you want to overwrite all others
+        String mandatoryPermission = "confluence-administrators";       // this should be an admin account to allow for system fixing
+        List<String> priorityPermissions = new ArrayList<>();
+        priorityPermissions.addAll(Arrays.asList("rl2"));    // mandatoryPermission should always be a part of this array to avoid it getting removed
+
+        List<SpacePermission> replacePermissions = new ArrayList<>();
+        Boolean replacePermissionsReq = false;
+        for (SpacePermission permission : spacePermissions) {
+            if(permission.isGroupPermission()) {
+                if(priorityPermissions.contains(permission.getGroup())) {
+                    if(permission.getGroup() != mandatoryPermission) {
+                        System.out.println("--------++++++++======== FOUND PRIORITY PERMISSION ========++++++++--------");
+                        replacePermissionsReq = true;
+                    }
+                    replacePermissions.add(permission);
+                }
+            }
+        }
+        if(replacePermissionsReq) {
+            System.out.println("--------++++++++======== REPLACING PERMISSIONS ========++++++++--------");
+            space.removeAllPermissions();
+            for (SpacePermission permission : replacePermissions) {
+                System.out.println("--------++++++++======== ADDING PERMISSION : "+permission.toString()+" ========++++++++--------");
+                space.addPermission(permission);
+            }
+        }
+
+        Boolean missingMandatoryPermission = true;
+        for (SpacePermission permission : spacePermissions) {
+            System.out.println("--------++++++++======== "+permission.toString()+" ========++++++++--------");
+            if(permission.isGroupPermission()) {
+                System.out.println("--------++++++++======== GROUP PERMISSION : "+permission.getGroup()+" ========++++++++--------");
+                if(permission.getGroup() == mandatoryPermission) {
+                    System.out.println("--------++++++++======== FOUND MANDATORY PERMISSION ========++++++++--------");
+                    missingMandatoryPermission = false;
+                }
+            }
+        }
+        if(missingMandatoryPermission) {
+            System.out.println("--------++++++++======== MISSING THE MANDATORY PERMISSION GROUP ========++++++++--------");
+            for (String type : SpacePermission.PERMISSION_TYPES) {
+                space.addPermission(SpacePermission.createGroupSpacePermission(type, space, mandatoryPermission));
+            }
+        }
+
+        System.out.println("--------++++++++======== DONE CHECKING PERMISSIONS ========++++++++--------");
+    }
+    /* ---+++=== END PERMISSIONS PROCESSING ===+++--- */
 
     /* ---+++=== NOTIFICATION (WATCHER) PROCESSING ===+++--- */
     public void pageNotificationCull(Page page) {
@@ -208,7 +262,7 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
                 .fetchMany(type, request);
 
             for(Content content : spaceContent.getResults()) {
-                ContentUpdateController(content.getType().getType(), content.getId());
+                contentUpdateController(content.getType().getType(), content.getId());
             }
             start += limit;
             repeat = spaceContent.hasMore();
@@ -229,7 +283,7 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
         /* DEBUG */System.out.println("--------++++++++========  ATTEMPTING TO WATCH SPACE CHILDREN ========++++++++--------");
         this.isSpaceWatchEvent = false;
         // Get all children content of a space
-        List<ContentEntityObject> spaceContent = new ArrayList<ContentEntityObject>();
+        List<ContentEntityObject> spaceContent = new ArrayList<>();
         spaceContent.addAll(utilities.getSpaceChildrenContent(ContentType.PAGE, space));
         spaceContent.addAll(utilities.getSpaceChildrenContent(ContentType.BLOG_POST, space));
 
@@ -244,7 +298,7 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
     /* ---+++=== END NOTIFICATION (WATCHER) PROCESSING ===+++--- */
     
     /* ---+++=== CONTROLLER FUNCTIONS ===+++--- */
-    public void ContentUpdateController(String type, ContentId id) {
+    public void contentUpdateController(String type, ContentId id) {
         switch(type) {
             case "page" :
                 Page page = pageService.getIdPageLocator(id.asLong()).getPage();
@@ -285,7 +339,7 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
     @EventListener
     public void onContentPermissionsUpdate(ContentPermissionEvent event) {
         /* DEBUG */System.out.println("--------++++++++======== PERMISSIONS EVENT ========++++++++--------");
-        ContentUpdateController(event.getContent().getType(), event.getContent().getContentId());
+        contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
     }
 
     // ON PAGE EVENTS (Filtering for move, update and created events specifically)
@@ -316,11 +370,16 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
     @EventListener
     public void onSpaceEvents(SpaceEvent event) { 
         if(
+            (event instanceof SpacePermissionsUpdateEvent)
+        ){ // Update space permissions
+            updateSpacePermissions(event.getSpace());
+        }
+
+        if(
             (event instanceof SpacePermissionsUpdateEvent) ||
             (event instanceof SpaceUpdateEvent) ||
             (event instanceof SpaceCreateEvent)
-        ) {
-            // Update Children Page Watchers
+        ) { // Update Children Page Watchers
             com.atlassian.confluence.api.model.content.Space space = spaceService.find()
                 .withKeys(event.getSpace().getKey())
                 .fetch().get();
@@ -328,6 +387,7 @@ public class NotificationsListener implements InitializingBean, DisposableBean {
             cullSpaceChildContentWatchers(ContentType.PAGE, space);
             cullSpaceChildContentWatchers(ContentType.BLOG_POST, space);
         }
+
         if(
             (event instanceof SpaceArchivedEvent)
         ) { // Remove all watchers of a space once it becomes archived
