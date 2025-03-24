@@ -19,7 +19,7 @@
     <context>plugin</context> 
   </web-resource>  
 
-  <servlet-filter key="admin-servlet" class="com.example.test.servlet.AllRequestServlet"> 
+  <!-- <servlet-filter key="admin-servlet" class="com.example.test.servlet.AllRequestServlet"> 
     <url-pattern>/*</url-pattern>  
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>INCLUDE</dispatcher>  
@@ -52,5 +52,5 @@
         <dispatcher>INCLUDE</dispatcher>  
         <dispatcher>FORWARD</dispatcher>  
         <weight>0</weight>  
-    </servlet-filter>
+    </servlet-filter> -->
 </atlassian-plugin>
