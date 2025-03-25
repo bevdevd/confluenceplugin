@@ -124,13 +124,13 @@ public class EventsListener implements InitializingBean, DisposableBean {
     private static final Logger log = LoggerFactory.getLogger(EventsListener.class);
 
     private Boolean isSpaceWatchEvent = false;
+    private Boolean isUserPermissionEventCreated = false;
 
     private Utilities utilities;
 
     String mandatoryPermission = "confluence-administrators";       // this should be an admin account to allow for system fixing
     String allowedToRemovePriorityGroups = "confluence-administrators";     //Ideally should be the same as the mandatory permission
     List<String> priorityPermissions = new ArrayList<>();
-    
 
     private List<SpacePermission> removedSpacePermissions = new ArrayList<>();
 
@@ -237,6 +237,91 @@ public class EventsListener implements InitializingBean, DisposableBean {
         }
 
         System.out.println("--------++++++++======== DONE CHECKING PERMISSIONS ========++++++++--------");
+    }
+
+    //Content Permission Processing
+    public void updateContentPermissions(ContentEntityObject content, ContentPermission updatedPermission) {
+        Boolean replacePermissions = false;
+        List<ContentPermission> contentPermissions = new ArrayList<>();
+        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.EDIT_PERMISSION)) {
+            System.out.println(set.toString());
+            for(ContentPermission permission : set) {
+                contentPermissions.add(permission);
+                if(this.priorityPermissions.contains(permission.getGroupName())) {
+                    replacePermissions = true;
+                }
+            }
+        }
+        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION)) {
+            System.out.println(set.toString());
+            for(ContentPermission permission : set) {
+                contentPermissions.add(permission);
+                if(this.priorityPermissions.contains(permission.getGroupName())) {
+                    replacePermissions = true;
+                }
+            }
+        }
+
+        // Check what permission was updated, and how
+        if(updatedPermission.isGroupPermission()){
+            if(contentPermissions.contains(updatedPermission)) {
+                //The permission was added
+                if(replacePermissions) {
+                        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.EDIT_PERMISSION)) {
+                            // for(ContentPermission permission : set) {
+                            //     if(
+                            //         (!permission.equals(updatedPermission)) &&
+                            //         (!this.priorityPermissions.contains(permission.getGroupName())) &&
+                            //         (!permission.getGroupName().equals(this.mandatoryPermission))
+                            //     ) {
+                            //         System.out.println("--------++++++++======== REMOVING PERMISSION : "+permission.toString()+" ========++++++++--------");
+                            //         System.out.println("--------++++++++======== "+permission.getGroupName()+" ========++++++++--------");
+                            //         set.removeContentPermission(permission);
+                            //     }
+                            // }
+                            content.removeContentPermissionSet(set);
+                        }
+                        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION)) {
+                            for(ContentPermission permission : set) {
+                                // if(
+                                //     (!permission.equals(updatedPermission)) &&
+                                //     (!this.priorityPermissions.contains(permission.getGroupName())) &&
+                                //     (!permission.getGroupName().equals(this.mandatoryPermission))
+                                // ) {
+                                //     System.out.println("--------++++++++======== REMOVING PERMISSION : "+permission.toString()+" ========++++++++--------");
+                                //     System.out.println("--------++++++++======== "+permission.getGroupName()+" ========++++++++--------");
+                                //     set.removeContentPermission(permission);
+                                // }
+                                content.removeContentPermissionSet(set);
+                            }
+                            content.addPermission(updatedPermission);
+                        }
+                }
+            } else {
+                    //The permission was removed
+                    if(this.priorityPermissions.contains(updatedPermission.getGroupName())) {
+                    // Only the allowed admin group can remove the priority group
+                    ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
+                    if(!userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
+                        content.addPermission(updatedPermission);
+                    }
+                    }
+            }
+        }
+
+        //Check if the mandatory permission is part of the content permissions
+        Boolean missingMandatory = true;
+        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.EDIT_PERMISSION)) {
+            for(ContentPermission permission : set) {
+                if(permission.getGroupName() == this.mandatoryPermission) {
+                    missingMandatory = false;
+                    break;
+                }
+            }
+        }
+        if(missingMandatory) {
+            content.addPermission(ContentPermission.createGroupPermission(ContentPermission.EDIT_PERMISSION, this.mandatoryPermission));
+        }
     }
     /* ---+++=== END PERMISSIONS PROCESSING ===+++--- */
 
@@ -429,8 +514,12 @@ public class EventsListener implements InitializingBean, DisposableBean {
     // ON CONTENT PERMISSIONS UPDATE (Filtering for page update events specifically)
     @EventListener
     public void onContentPermissionsUpdate(ContentPermissionEvent event) {
-        /* DEBUG */System.out.println("--------++++++++======== CONTENT PERMISSIONS EVENT ========++++++++--------");
-        contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
+        if(!this.isUserPermissionEventCreated) {
+            isUserPermissionEventCreated = true;
+            updateContentPermissions(event.getContent(), event.getContentPermission());
+            // contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
+        }
+        this.isUserPermissionEventCreated = false;
     }
     /* ---+++=== END EVENT LISTENERS ===+++--- */
 }
