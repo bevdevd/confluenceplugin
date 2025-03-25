@@ -85,6 +85,9 @@ import com.atlassian.confluence.event.events.content.blogpost.BlogPostCreateEven
 
 import com.atlassian.confluence.event.events.security.ContentPermissionEvent;
 
+import com.atlassian.confluence.event.events.permission.SpacePermissionEvent;
+import com.atlassian.confluence.event.events.permission.SpacePermissionRemoveEvent;
+
 import com.atlassian.confluence.event.events.space.SpaceEvent;
 import com.atlassian.confluence.event.events.space.SpacePermissionsUpdateEvent;
 import com.atlassian.confluence.event.events.space.SpaceUpdateEvent;
@@ -124,6 +127,13 @@ public class EventsListener implements InitializingBean, DisposableBean {
 
     private Utilities utilities;
 
+    String mandatoryPermission = "confluence-administrators";       // this should be an admin account to allow for system fixing
+    String allowedToRemovePriorityGroups = "confluence-administrators";     //Ideally should be the same as the mandatory permission
+    List<String> priorityPermissions = new ArrayList<>();
+    
+
+    private List<SpacePermission> removedSpacePermissions = new ArrayList<>();
+
     @Inject
     public EventsListener (
         EventPublisher eventPublisher,
@@ -152,6 +162,9 @@ public class EventsListener implements InitializingBean, DisposableBean {
             this.blogPostService,
             this.spaceService
         );
+
+        // Add any priority permission groups here
+        this.priorityPermissions.addAll(Arrays.asList("rl2"));
     }
 
     @Override
@@ -165,29 +178,38 @@ public class EventsListener implements InitializingBean, DisposableBean {
     /* End Essential Setup */
 
     /* ---+++=== PERMISSIONS PROCESSING ===+++--- */
+    // Space Permission Processing
+    public void spacePermissionRemovedChecker(Space space, SpacePermission removedPermission) {
+        ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
+        System.out.println("--------++++++++======== LOGGED IN USER : "+loggedInUser.getName()+" ========++++++++--------");
+
+        if(removedPermission.isGroupPermission()) {
+            if(this.priorityPermissions.contains(removedPermission.getGroup())){
+                if(!userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
+                    System.out.println("--------++++++++======== UNAUTHED USER ATTEMPTED TO REMOVE PRIORITY GROUP, UNDOING ========++++++++--------");
+                    space.addPermission(removedPermission);
+                } else {
+                    System.out.println("--------++++++++======== USER ALLOWED TO REMOVE PRIORITY GROUP, CONTINUING ========++++++++--------");
+                }
+            }
+        }
+    }
     public void updateSpacePermissions(Space space) {
         System.out.println("--------++++++++======== CHECKING PERMISSION GROUPS ========++++++++--------");
         List<SpacePermission> spacePermissions = space.getPermissions();
-
-        // Replace with the restriction/class level you want to overwrite all others
-        String mandatoryPermission = "confluence-administrators";       // this should be an admin account to allow for system fixing
-        List<String> priorityPermissions = new ArrayList<>();
-        priorityPermissions.addAll(Arrays.asList("rl2"));    // mandatoryPermission should always be a part of this array to avoid it getting removed
 
         List<SpacePermission> replacePermissions = new ArrayList<>();
         Boolean replacePermissionsReq = false;
         for (SpacePermission permission : spacePermissions) {
             if(permission.isGroupPermission()) {
-                if(priorityPermissions.contains(permission.getGroup())) {
-                    if(permission.getGroup() != mandatoryPermission) {
-                        System.out.println("--------++++++++======== FOUND PRIORITY PERMISSION ========++++++++--------");
-                        replacePermissionsReq = true;
-                    }
+                if(this.priorityPermissions.contains(permission.getGroup())) {
+                    System.out.println("--------++++++++======== FOUND PRIORITY PERMISSION ========++++++++--------");
+                    // replacePermissionsReq = true;
                     replacePermissions.add(permission);
                 }
             }
         }
-        if(replacePermissionsReq) {
+        if(!replacePermissions.isEmpty()) {
             System.out.println("--------++++++++======== REPLACING PERMISSIONS ========++++++++--------");
             space.removeAllPermissions();
             for (SpacePermission permission : replacePermissions) {
@@ -201,7 +223,7 @@ public class EventsListener implements InitializingBean, DisposableBean {
             System.out.println("--------++++++++======== "+permission.toString()+" ========++++++++--------");
             if(permission.isGroupPermission()) {
                 System.out.println("--------++++++++======== GROUP PERMISSION : "+permission.getGroup()+" ========++++++++--------");
-                if(permission.getGroup() == mandatoryPermission) {
+                if(permission.getGroup() == this.mandatoryPermission) {
                     System.out.println("--------++++++++======== FOUND MANDATORY PERMISSION ========++++++++--------");
                     missingMandatoryPermission = false;
                 }
@@ -335,13 +357,6 @@ public class EventsListener implements InitializingBean, DisposableBean {
         this.isSpaceWatchEvent = false;
     }
 
-    // ON CONTENT PERMISSIONS UPDATE (Filtering for page update events specifically)
-    @EventListener
-    public void onContentPermissionsUpdate(ContentPermissionEvent event) {
-        /* DEBUG */System.out.println("--------++++++++======== PERMISSIONS EVENT ========++++++++--------");
-        contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
-    }
-
     // ON PAGE EVENTS (Filtering for move, update and created events specifically)
     @EventListener
     public void onPageEvents(PageEvent event) {
@@ -393,6 +408,29 @@ public class EventsListener implements InitializingBean, DisposableBean {
         ) { // Remove all watchers of a space once it becomes archived
             notificationManager.removeAllNotificationsForSpace(event.getSpace());
         }
+    }
+
+    @EventListener
+    public void onSpacePermissionEvents(SpacePermissionRemoveEvent event) {
+        System.out.println("--------++++++++======== SPACE PERMISSIONS EVENT ========++++++++--------");
+        List<SpacePermission> updatedPermissions = (List<SpacePermission>) event.getPermissions();
+        for(SpacePermission spacePermission : updatedPermissions) {
+            try {
+                System.out.println(spacePermission.toString());
+                System.out.println(event.getSpace().getKey());
+                spacePermissionRemovedChecker(event.getSpace(), spacePermission);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            
+        }
+    }
+
+    // ON CONTENT PERMISSIONS UPDATE (Filtering for page update events specifically)
+    @EventListener
+    public void onContentPermissionsUpdate(ContentPermissionEvent event) {
+        /* DEBUG */System.out.println("--------++++++++======== CONTENT PERMISSIONS EVENT ========++++++++--------");
+        contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
     }
     /* ---+++=== END EVENT LISTENERS ===+++--- */
 }
