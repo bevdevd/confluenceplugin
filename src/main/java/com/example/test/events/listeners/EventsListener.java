@@ -124,7 +124,6 @@ public class EventsListener implements InitializingBean, DisposableBean {
     private static final Logger log = LoggerFactory.getLogger(EventsListener.class);
 
     private Boolean isSpaceWatchEvent = false;
-    private Boolean isUserPermissionEventCreated = false;
 
     private Utilities utilities;
 
@@ -181,145 +180,120 @@ public class EventsListener implements InitializingBean, DisposableBean {
     // Space Permission Processing
     public void spacePermissionRemovedChecker(Space space, SpacePermission removedPermission) {
         ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
-        System.out.println("--------++++++++======== LOGGED IN USER : "+loggedInUser.getName()+" ========++++++++--------");
+        /* DEBUG */System.out.println("--------++++++++======== LOGGED IN USER : "+loggedInUser.getName()+" ========++++++++--------");
 
         if(removedPermission.isGroupPermission()) {
             if(this.priorityPermissions.contains(removedPermission.getGroup())){
                 if(!userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
-                    System.out.println("--------++++++++======== UNAUTHED USER ATTEMPTED TO REMOVE PRIORITY GROUP, UNDOING ========++++++++--------");
+                    /* DEBUG */System.out.println("--------++++++++======== UNAUTHED USER ATTEMPTED TO REMOVE PRIORITY GROUP, UNDOING ========++++++++--------");
                     space.addPermission(removedPermission);
                 } else {
-                    System.out.println("--------++++++++======== USER ALLOWED TO REMOVE PRIORITY GROUP, CONTINUING ========++++++++--------");
+                    /* DEBUG */System.out.println("--------++++++++======== USER ALLOWED TO REMOVE PRIORITY GROUP, CONTINUING ========++++++++--------");
                 }
             }
         }
     }
     public void updateSpacePermissions(Space space) {
-        System.out.println("--------++++++++======== CHECKING PERMISSION GROUPS ========++++++++--------");
+        /* DEBUG */System.out.println("--------++++++++======== CHECKING PERMISSION GROUPS ========++++++++--------");
         List<SpacePermission> spacePermissions = space.getPermissions();
 
-        List<SpacePermission> replacePermissions = new ArrayList<>();
-        Boolean replacePermissionsReq = false;
+        List<SpacePermission> updatingPriorityPermission = new ArrayList<>();
         for (SpacePermission permission : spacePermissions) {
             if(permission.isGroupPermission()) {
                 if(this.priorityPermissions.contains(permission.getGroup())) {
-                    System.out.println("--------++++++++======== FOUND PRIORITY PERMISSION ========++++++++--------");
-                    // replacePermissionsReq = true;
-                    replacePermissions.add(permission);
+                    /* DEBUG */System.out.println("--------++++++++======== FOUND PRIORITY PERMISSION ========++++++++--------");
+                    updatingPriorityPermission.add(permission);
                 }
             }
         }
-        if(!replacePermissions.isEmpty()) {
-            System.out.println("--------++++++++======== REPLACING PERMISSIONS ========++++++++--------");
+        if(!updatingPriorityPermission.isEmpty()) {
+            /* DEBUG */System.out.println("--------++++++++======== REPLACING PERMISSIONS ========++++++++--------");
             space.removeAllPermissions();
-            for (SpacePermission permission : replacePermissions) {
-                System.out.println("--------++++++++======== ADDING PERMISSION : "+permission.toString()+" ========++++++++--------");
+            for (SpacePermission permission : updatingPriorityPermission) {
+                /* DEBUG */System.out.println("--------++++++++======== ADDING PERMISSION : "+permission.toString()+" ========++++++++--------");
                 space.addPermission(permission);
             }
         }
 
         Boolean missingMandatoryPermission = true;
         for (SpacePermission permission : spacePermissions) {
-            System.out.println("--------++++++++======== "+permission.toString()+" ========++++++++--------");
+            /* DEBUG */System.out.println("--------++++++++======== "+permission.toString()+" ========++++++++--------");
             if(permission.isGroupPermission()) {
-                System.out.println("--------++++++++======== GROUP PERMISSION : "+permission.getGroup()+" ========++++++++--------");
-                if(permission.getGroup() == this.mandatoryPermission) {
-                    System.out.println("--------++++++++======== FOUND MANDATORY PERMISSION ========++++++++--------");
+                /* DEBUG */System.out.println("--------++++++++======== GROUP PERMISSION : "+permission.getGroup()+" ========++++++++--------");
+                if(permission.getGroup().equals(this.mandatoryPermission)) {
+                    /* DEBUG */System.out.println("--------++++++++======== FOUND MANDATORY PERMISSION GROUP ========++++++++--------");
                     missingMandatoryPermission = false;
                 }
             }
         }
         if(missingMandatoryPermission) {
-            System.out.println("--------++++++++======== MISSING THE MANDATORY PERMISSION GROUP ========++++++++--------");
+            /* DEBUG */System.out.println("--------++++++++======== MISSING MANDATORY PERMISSION GROUP ========++++++++--------");
             for (String type : SpacePermission.PERMISSION_TYPES) {
                 space.addPermission(SpacePermission.createGroupSpacePermission(type, space, mandatoryPermission));
             }
         }
 
-        System.out.println("--------++++++++======== DONE CHECKING PERMISSIONS ========++++++++--------");
+        /* DEBUG */System.out.println("--------++++++++======== DONE CHECKING PERMISSIONS ========++++++++--------");
     }
 
     //Content Permission Processing
     public void updateContentPermissions(ContentEntityObject content, ContentPermission updatedPermission) {
-        Boolean replacePermissions = false;
+        Boolean updatingPriorityPermission = (this.priorityPermissions.contains(updatedPermission.getGroupName()));
+
+        // Get all existing content permissions
+        String[] permissionTypes = {ContentPermission.EDIT_PERMISSION, ContentPermission.VIEW_PERMISSION};
         List<ContentPermission> contentPermissions = new ArrayList<>();
-        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.EDIT_PERMISSION)) {
-            System.out.println(set.toString());
-            for(ContentPermission permission : set) {
-                contentPermissions.add(permission);
-                if(this.priorityPermissions.contains(permission.getGroupName())) {
-                    replacePermissions = true;
+        for(String type : permissionTypes) {
+            for(ContentPermission permission : content.getContentPermissionSet(type)) {
+                if(permission.isGroupPermission()) {
+                    contentPermissions.add(permission);
                 }
             }
         }
-        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION)) {
-            System.out.println(set.toString());
-            for(ContentPermission permission : set) {
-                contentPermissions.add(permission);
-                if(this.priorityPermissions.contains(permission.getGroupName())) {
-                    replacePermissions = true;
-                }
-            }
+
+        for (ContentPermission permission : contentPermissions) {
+            /* DEBUG */System.out.println(permission.toString());
         }
 
         // Check what permission was updated, and how
-        if(updatedPermission.isGroupPermission()){
-            if(contentPermissions.contains(updatedPermission)) {
-                //The permission was added
-                if(replacePermissions) {
-                        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.EDIT_PERMISSION)) {
-                            // for(ContentPermission permission : set) {
-                            //     if(
-                            //         (!permission.equals(updatedPermission)) &&
-                            //         (!this.priorityPermissions.contains(permission.getGroupName())) &&
-                            //         (!permission.getGroupName().equals(this.mandatoryPermission))
-                            //     ) {
-                            //         System.out.println("--------++++++++======== REMOVING PERMISSION : "+permission.toString()+" ========++++++++--------");
-                            //         System.out.println("--------++++++++======== "+permission.getGroupName()+" ========++++++++--------");
-                            //         set.removeContentPermission(permission);
-                            //     }
-                            // }
-                            content.removeContentPermissionSet(set);
+        if(updatingPriorityPermission) {//Only do the following processing IF the permission being updated is a priority permission, we don't really care to check others
+            /* DEBUG */System.out.println("--------++++++++======== UPDATING A PRIORITY PERMISSION ========++++++++--------");
+            if(updatedPermission.isGroupPermission()){
+                if(contentPermissions.contains(updatedPermission)) {//The permission was added
+                    /* DEBUG */System.out.println("--------++++++++======== ATTEMPTING TO ADD PERMISSION : "+updatedPermission.toString()+" ========++++++++--------");
+                    for(ContentPermission permission : contentPermissions){
+                        if(
+                            (!this.priorityPermissions.contains(permission.getGroupName())) &&
+                            (!permission.getGroupName().equals(this.mandatoryPermission))
+                        ) {
+                            /* DEBUG */System.out.println("--------++++++++======== REMOVING PERMISSION : "+permission.toString()+" ========++++++++--------");
+                            this.contentPermissionManager.removeContentPermission(permission);
                         }
-                        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION)) {
-                            for(ContentPermission permission : set) {
-                                // if(
-                                //     (!permission.equals(updatedPermission)) &&
-                                //     (!this.priorityPermissions.contains(permission.getGroupName())) &&
-                                //     (!permission.getGroupName().equals(this.mandatoryPermission))
-                                // ) {
-                                //     System.out.println("--------++++++++======== REMOVING PERMISSION : "+permission.toString()+" ========++++++++--------");
-                                //     System.out.println("--------++++++++======== "+permission.getGroupName()+" ========++++++++--------");
-                                //     set.removeContentPermission(permission);
-                                // }
-                                content.removeContentPermissionSet(set);
-                            }
-                            content.addPermission(updatedPermission);
-                        }
-                }
-            } else {
-                    //The permission was removed
-                    if(this.priorityPermissions.contains(updatedPermission.getGroupName())) {
-                    // Only the allowed admin group can remove the priority group
+                    }
+                } else {//The permission was removed
+                    /* DEBUG */System.out.println("--------++++++++======== ATTEMPTING TO REMOVE PERMISSION : "+updatedPermission.toString()+" ========++++++++--------");
                     ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
-                    if(!userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
-                        content.addPermission(updatedPermission);
+                    /* DEBUG */System.out.println("--------++++++++======== LOGGED IN USER : "+loggedInUser.getName()+" ========++++++++--------");
+                    if(!this.userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
+                        /* DEBUG */System.out.println("--------++++++++======== UNAUTHED USER ATTEMPTED TO REMOVE PRIORITY GROUP, UNDOING ========++++++++--------");
+                        this.contentPermissionManager.addContentPermission(updatedPermission, content);
+                    } else {
+                        /* DEBUG */System.out.println("--------++++++++======== USER ALLOWED TO REMOVE PRIORITY GROUP, CONTINUING ========++++++++--------");
                     }
-                    }
+                }
             }
         }
-
         //Check if the mandatory permission is part of the content permissions
         Boolean missingMandatory = true;
-        for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.EDIT_PERMISSION)) {
-            for(ContentPermission permission : set) {
-                if(permission.getGroupName() == this.mandatoryPermission) {
-                    missingMandatory = false;
-                    break;
-                }
+        for(ContentPermission permission : content.getContentPermissionSet(ContentPermission.EDIT_PERMISSION)) {
+            if(permission.getGroupName().equals(this.mandatoryPermission)) {
+                /* DEBUG */System.out.println("--------++++++++======== FOUND MANDATORY PERMISSION GROUP ========++++++++--------");
+                missingMandatory = false;
+                break;
             }
         }
         if(missingMandatory) {
+            /* DEBUG */System.out.println("--------++++++++======== MISSING MANDATORY PERMISSION GROUP ========++++++++--------");
             content.addPermission(ContentPermission.createGroupPermission(ContentPermission.EDIT_PERMISSION, this.mandatoryPermission));
         }
     }
@@ -514,12 +488,9 @@ public class EventsListener implements InitializingBean, DisposableBean {
     // ON CONTENT PERMISSIONS UPDATE (Filtering for page update events specifically)
     @EventListener
     public void onContentPermissionsUpdate(ContentPermissionEvent event) {
-        if(!this.isUserPermissionEventCreated) {
-            isUserPermissionEventCreated = true;
-            updateContentPermissions(event.getContent(), event.getContentPermission());
-            // contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
-        }
-        this.isUserPermissionEventCreated = false;
+        System.out.println("--------++++++++======== CONTENT PERMISSION EVENT ========++++++++--------");
+        updateContentPermissions(event.getContent(), event.getContentPermission());
+        // contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
     }
     /* ---+++=== END EVENT LISTENERS ===+++--- */
 }
