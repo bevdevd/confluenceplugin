@@ -19,7 +19,8 @@
     <context>plugin</context> 
   </web-resource>  
 
-  <!-- <servlet-filter key="admin-servlet" class="com.example.test.servlet.AllRequestServlet"> 
+  <servlet-filter key="contentServletFilter" class="com.example.test.servlet.BlockContentServletFilter">
+    <description> Block access to content that aren't pages</description> 
     <url-pattern>/*</url-pattern>  
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>INCLUDE</dispatcher>  
@@ -27,7 +28,7 @@
     <weight>0</weight>  
   </servlet-filter>
 
-  <servlet-filter key = "directViewFilter" class="com.plugins.permissions.DirectViewServletFilter">
+  <!-- <servlet-filter key = "directViewFilter" class="com.plugins.permissions.DirectViewServletFilter">
         <description> Direct View Servlet Filter </description>
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>  

@@ -238,7 +238,9 @@ public class EventsListener implements InitializingBean, DisposableBean {
 
     //Content Permission Processing
     public void updateContentPermissions(ContentEntityObject content, ContentPermission updatedPermission) {
+        /* DEBUG */System.out.println("--------++++++++======== UPDATING PERMISSION "+updatedPermission.toString()+" ========++++++++--------");
         Boolean updatingPriorityPermission = (this.priorityPermissions.contains(updatedPermission.getGroupName()));
+        Boolean containsPriorityPermission = false;
 
         // Get all existing content permissions
         String[] permissionTypes = {ContentPermission.EDIT_PERMISSION, ContentPermission.VIEW_PERMISSION};
@@ -246,8 +248,11 @@ public class EventsListener implements InitializingBean, DisposableBean {
         for(String type : permissionTypes) {
             for(ContentPermission permission : content.getContentPermissionSet(type)) {
                 if(permission.isGroupPermission()) {
-                    contentPermissions.add(permission);
+                    if(this.priorityPermissions.contains(permission.getGroupName())) {
+                        containsPriorityPermission = true;
+                    }
                 }
+                contentPermissions.add(permission);
             }
         }
 
@@ -256,30 +261,34 @@ public class EventsListener implements InitializingBean, DisposableBean {
         }
 
         // Check what permission was updated, and how
-        if(updatingPriorityPermission) {//Only do the following processing IF the permission being updated is a priority permission, we don't really care to check others
-            /* DEBUG */System.out.println("--------++++++++======== UPDATING A PRIORITY PERMISSION ========++++++++--------");
-            if(updatedPermission.isGroupPermission()){
-                if(contentPermissions.contains(updatedPermission)) {//The permission was added
-                    /* DEBUG */System.out.println("--------++++++++======== ATTEMPTING TO ADD PERMISSION : "+updatedPermission.toString()+" ========++++++++--------");
-                    for(ContentPermission permission : contentPermissions){
-                        if(
-                            (!this.priorityPermissions.contains(permission.getGroupName())) &&
-                            (!permission.getGroupName().equals(this.mandatoryPermission))
-                        ) {
-                            /* DEBUG */System.out.println("--------++++++++======== REMOVING PERMISSION : "+permission.toString()+" ========++++++++--------");
-                            this.contentPermissionManager.removeContentPermission(permission);
-                        }
+        if(contentPermissions.contains(updatedPermission)) {//The permission was added
+            if(containsPriorityPermission) {
+                 /* DEBUG */System.out.println("--------++++++++======== ATTEMPTING TO ADD PERMISSION : "+updatedPermission.toString()+" WITH PRIORITY PRESENT ========++++++++--------");
+                for(ContentPermission permission : contentPermissions){
+                    if(
+                        (permission.isGroupPermission()) &&
+                        (!this.priorityPermissions.contains(permission.getGroupName())) &&
+                        (!permission.getGroupName().equals(this.mandatoryPermission))
+                    ) {
+                        /* DEBUG */System.out.println("--------++++++++======== REMOVING GROUP PERMISSION : "+permission.toString()+" ========++++++++--------");
+                        this.contentPermissionManager.removeContentPermission(permission);
                     }
-                } else {//The permission was removed
-                    /* DEBUG */System.out.println("--------++++++++======== ATTEMPTING TO REMOVE PERMISSION : "+updatedPermission.toString()+" ========++++++++--------");
-                    ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
-                    /* DEBUG */System.out.println("--------++++++++======== LOGGED IN USER : "+loggedInUser.getName()+" ========++++++++--------");
-                    if(!this.userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
-                        /* DEBUG */System.out.println("--------++++++++======== UNAUTHED USER ATTEMPTED TO REMOVE PRIORITY GROUP, UNDOING ========++++++++--------");
-                        this.contentPermissionManager.addContentPermission(updatedPermission, content);
-                    } else {
-                        /* DEBUG */System.out.println("--------++++++++======== USER ALLOWED TO REMOVE PRIORITY GROUP, CONTINUING ========++++++++--------");
+                    if(permission.isUserPermission()){
+                        /* DEBUG */System.out.println("--------++++++++======== REMOVING USER PERMISSION : "+permission.toString()+" ========++++++++--------");
+                        this.contentPermissionManager.removeContentPermission(permission);
                     }
+                }
+            }
+        } else {//The permission was removed
+            if(updatingPriorityPermission) {
+                /* DEBUG */System.out.println("--------++++++++======== ATTEMPTING TO REMOVE PRIORITY PERMISSION : "+updatedPermission.toString()+" ========++++++++--------");
+                ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
+                /* DEBUG */System.out.println("--------++++++++======== LOGGED IN USER : "+loggedInUser.getName()+" ========++++++++--------");
+                if(!this.userAccessor.getGroupNames(loggedInUser).contains(this.allowedToRemovePriorityGroups)) {
+                    /* DEBUG */System.out.println("--------++++++++======== UNAUTHED USER ATTEMPTED TO REMOVE PRIORITY GROUP, UNDOING ========++++++++--------");
+                    this.contentPermissionManager.addContentPermission(updatedPermission, content);
+                } else {
+                    /* DEBUG */System.out.println("--------++++++++======== USER ALLOWED TO REMOVE PRIORITY GROUP, CONTINUING ========++++++++--------");
                 }
             }
         }
@@ -490,7 +499,7 @@ public class EventsListener implements InitializingBean, DisposableBean {
     public void onContentPermissionsUpdate(ContentPermissionEvent event) {
         System.out.println("--------++++++++======== CONTENT PERMISSION EVENT ========++++++++--------");
         updateContentPermissions(event.getContent(), event.getContentPermission());
-        // contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
+        contentUpdateController(event.getContent().getType(), event.getContent().getContentId());
     }
     /* ---+++=== END EVENT LISTENERS ===+++--- */
 }
