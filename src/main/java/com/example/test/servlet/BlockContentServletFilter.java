@@ -154,7 +154,8 @@ public class BlockContentServletFilter implements Filter{
                 uri.contains("viewrecentblogposts.action") ||
                 uri.contains("editblogpost.action")
             ){  // Block these accesses directly, no further logic needed
-                System.out.println("uh uh, bad");
+                /* DEBUG */System.out.println("--------++++++++======== USER ATTEMPTED TO ACCESS A RESTRICTED FEATURE ========++++++++--------");
+                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
             }
             if(
                 uri.contains("viewpage.action")
@@ -162,7 +163,8 @@ public class BlockContentServletFilter implements Filter{
                 if(request.getParameter("pageId") != null) {
                     Content content = contentService.find().withId(ContentId.of(Long.parseLong(request.getParameter("pageId")))).fetch().get();
                     if(content.getType().getType().equals("blogpost")) {
-                        System.out.println("uh uh, bad");
+                        /* DEBUG */System.out.println("--------++++++++======== USER ATTEMPTED TO ACCESS A RESTRICTED FEATURE ========++++++++--------");
+                        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                     }
                 }
             }

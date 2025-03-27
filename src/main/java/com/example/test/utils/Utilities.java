@@ -97,7 +97,7 @@ public class Utilities {
     }
 
     // Restriction Checks
-    public Boolean isContentRestricted(ContentEntityObject content,List<String> userPermissionGroups) {
+    public Boolean isContentRestricted(ContentEntityObject content, List<String> userPermissionGroups) {
         //before anything, check if the content is in a restricted space
         SpaceContentEntityObject spaceContent = (SpaceContentEntityObject) content;
         Space space = spaceContent.getSpace();
@@ -111,6 +111,7 @@ public class Utilities {
                 String groupName = permission.getGroupName();
                 System.out.println("--------++++++++======== GROUP : "+groupName+" ========++++++++--------");
                 if(groupName == null) {
+                    System.out.println("--------++++++++======== SKIPPING NULL GROUP ========++++++++--------");
                     continue;
                 }
                 if(!userPermissionGroups.contains(groupName)){
