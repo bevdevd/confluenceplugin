@@ -19,14 +19,14 @@
     <context>plugin</context> 
   </web-resource>  
 
-  <servlet-filter key="contentServletFilter" class="com.example.test.servlet.BlockContentServletFilter">
+  <!-- <servlet-filter key="contentServletFilter" class="com.example.test.servlet.BlockContentServletFilter">
     <description> Block access to content that aren't pages</description> 
     <url-pattern>/*</url-pattern>  
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>INCLUDE</dispatcher>  
     <dispatcher>FORWARD</dispatcher>  
     <weight>0</weight>  
-  </servlet-filter>
+  </servlet-filter> -->
 
   <!-- <servlet-filter key = "directViewFilter" class="com.plugins.permissions.DirectViewServletFilter">
         <description> Direct View Servlet Filter </description>
