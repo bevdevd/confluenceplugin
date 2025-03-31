@@ -47,6 +47,7 @@ import com.atlassian.confluence.security.SpacePermission;
 import com.atlassian.confluence.user.ConfluenceUser;
 import com.atlassian.confluence.user.AuthenticatedUserThreadLocal;
 import com.atlassian.confluence.user.UserAccessor;
+import com.atlassian.user.User;
 
 import com.atlassian.confluence.mail.notification.Notification;
 
