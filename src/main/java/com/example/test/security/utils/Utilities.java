@@ -46,6 +46,11 @@ public class Utilities {
               }
            }
         }
+        if(!userPermitted) {
+            System.out.println("========================================================================================================================");
+            System.out.println("USER DOES NOT HAVE PERMISSION TO INTERACT WITH SPACE");
+            System.out.println("========================================================================================================================");
+        }
         return userPermitted;
     }
 
@@ -69,8 +74,11 @@ public class Utilities {
                }
             }
          }
-         //If the end of the loop is reached, as in the return statement never fired, then the user must belong
-         //to all groups of that permission type attached to a space, allow the user access in this case
+         if(!userPermitted) {
+            System.out.println("========================================================================================================================");
+            System.out.println("USER DOES NOT HAVE PERMISSION TO INTERACT WITH CONTENT");
+            System.out.println("========================================================================================================================");
+        }
          return userPermitted;
     }
 }
