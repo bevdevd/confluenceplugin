@@ -2,6 +2,10 @@ package com.example.test.security;
 
 import com.example.test.security.delegates.NewPagePermissionsDelegate;
 import com.example.test.security.delegates.NewLinkPermissionsDelegate;
+import com.example.test.security.delegates.NewSpacePermissionsDelegate;
+import com.atlassian.confluence.security.delegate.SpaceDescriptionPermissionsDelegate;
+import com.example.test.security.delegates.NewPageTemplatePermissionsDelegate;
+import com.example.test.security.delegates.NewBlogPostPermissionsDelegate;
 
 import com.atlassian.confluence.security.DefaultPermissionManager;
 import com.atlassian.confluence.security.delegate.PagePermissionsDelegate;
@@ -59,7 +63,7 @@ public class InitializeDelegates {
             DefaultPermissionManager defaultPermissionManager = ComponentLocator.getComponent(DefaultPermissionManager.class);
             DefaultContentPermissionManager defaultContentPermissionManager = ComponentLocator.getComponent(DefaultContentPermissionManager.class);
 
-            printDelegateKeyPairs(defaultPermissionManager);
+            /* DEBUG */printDelegateKeyPairs(defaultPermissionManager);
             
             NewPagePermissionsDelegate pagePermissionsDelegate = new NewPagePermissionsDelegate();
             pagePermissionsDelegate.setSpacePermissionManager(this.spacePermissionManager);
@@ -69,9 +73,31 @@ public class InitializeDelegates {
             NewLinkPermissionsDelegate linkPermissionsDelegate = new NewLinkPermissionsDelegate();
             linkPermissionsDelegate.setUserAccessor(this.userAccessor);
 
+            NewSpacePermissionsDelegate spacePermissionsDelegate = new NewSpacePermissionsDelegate();
+            spacePermissionsDelegate.setSpacePermissionManager(this.spacePermissionManager);
+            spacePermissionsDelegate.setUserAccessor(this.userAccessor);
+
+            SpaceDescriptionPermissionsDelegate spaceDescriptionPermissionsDelegate = new SpaceDescriptionPermissionsDelegate();
+            spaceDescriptionPermissionsDelegate.setSpacePermissionManager(this.spacePermissionManager);
+            spaceDescriptionPermissionsDelegate.setSpacePermissionsDelegate(spacePermissionsDelegate);
+
+            NewPageTemplatePermissionsDelegate pageTemplatePermissionsDelegate = new NewPageTemplatePermissionsDelegate();
+            pageTemplatePermissionsDelegate.setSpacePermissionManager(this.spacePermissionManager);
+            pageTemplatePermissionsDelegate.setUserAccessor(this.userAccessor);
+
+            NewBlogPostPermissionsDelegate blogPostPermissionsDelegate = new NewBlogPostPermissionsDelegate();
+            blogPostPermissionsDelegate.setSpacePermissionManager(this.spacePermissionManager);
+            blogPostPermissionsDelegate.setContentPermissionManager(defaultContentPermissionManager);
+            blogPostPermissionsDelegate.setUserAccessor(this.userAccessor);
+
             defaultPermissionManager.register("Page", new SharedAccessInterceptor(pagePermissionsDelegate));
             defaultPermissionManager.register("OutgoingLink", new SharedAccessInterceptor(linkPermissionsDelegate));
-            printDelegateKeyPairs(defaultPermissionManager);
+            defaultPermissionManager.register("Space", new SharedAccessInterceptor(spacePermissionsDelegate));
+            defaultPermissionManager.register("SpaceDescription", new SharedAccessInterceptor(spaceDescriptionPermissionsDelegate));
+            defaultPermissionManager.register("PageTemplate", new SharedAccessInterceptor(pageTemplatePermissionsDelegate));
+            defaultPermissionManager.register("BlogPost", new SharedAccessInterceptor(blogPostPermissionsDelegate));
+
+            /* DEBUG */printDelegateKeyPairs(defaultPermissionManager);
             
         } catch (Exception e) {
             e.printStackTrace();

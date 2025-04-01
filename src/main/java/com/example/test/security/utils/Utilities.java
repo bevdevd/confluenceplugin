@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class Utilities {
     
-    private static final List<String> andPerms = Arrays.asList("rl2");//{};
+    private static final List<String> andPerms = Arrays.asList("rl2");
 
     Utilities(){}
 
@@ -34,14 +34,15 @@ public class Utilities {
                  if(!userAccessor.getGroupNamesForUserName(user.getName()).contains(spacePermission.getGroup())) {
                     //if the user isn't a member of any one of the groups attached to the space, check if it's one of the AND permissions
                     //if so immediately return false
-                    if(andPerms.contains(spacePermission.getGroup())) {
-                        System.out.println("========================================================================================================================");
-                        System.out.println("USER DOES NOT HAVE PERMISSION TO INTERACT WITH SPACE");
-                        System.out.println("========================================================================================================================");
-                        return false;
-                    }
+                     if(andPerms.contains(spacePermission.getGroup())) {
+                         System.out.println("========================================================================================================================");
+                         System.out.println("USER DOES NOT HAVE PERMISSION TO INTERACT WITH SPACE");
+                         System.out.println("========================================================================================================================");
+                         return false;
+                     }
                  } else {
-                    userPermitted = true;
+                     // If user is a part of any group attached to the content, grant permission, assuming they are part of all mandatory groups
+                     userPermitted = true;
                  }
               }
            }
@@ -62,17 +63,21 @@ public class Utilities {
                   if(!userAccessor.getGroupNamesForUserName(user.getName()).contains(permission.getGroupName())) {
                     //if the user isn't a member of any one of the groups attached to the content, check if it's one of the AND permissions
                     //if so immediately return false
-                    if(andPerms.contains(permission.getGroupName())) {
-                        System.out.println("========================================================================================================================");
-                        System.out.println("USER DOES NOT HAVE PERMISSION TO INTERACT WITH CONTENT");
-                        System.out.println("========================================================================================================================");
-                        return false;
-                    }
+                     if(andPerms.contains(permission.getGroupName())) {
+                         System.out.println("========================================================================================================================");
+                         System.out.println("USER DOES NOT HAVE PERMISSION TO INTERACT WITH CONTENT");
+                         System.out.println("========================================================================================================================");
+                         return false;
+                     }
                   } else {
-                    userPermitted = true;
+                     // If user is a part of any group attached to the content, grant permission, assuming they are part of all mandatory groups
+                     userPermitted = true;
                   }
                }
             }
+         } else {
+            // If content if unrestricted, permission is automatically granted
+            return true;
          }
          if(!userPermitted) {
             System.out.println("========================================================================================================================");
