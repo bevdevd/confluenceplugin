@@ -1,9 +1,0 @@
-{namespace Confluence.Templates.Mail.Utils}
-/**
-* Creates a user link
-* @param user
-* @param? linkTextHtml
-*/
-{template .userLink}
-    <a href="{call .sourceLink}{param urlString : baseUrl() + '/display/~' +$user.name/}{/call}">{if $linkTextHtml}{$linkTextHtml|noAutoescape}{else}{$user.fullName}{/if}</a>
-{/template}
