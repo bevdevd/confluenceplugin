@@ -98,47 +98,47 @@ public class Utilities {
     }
 
     // Restriction Checks
-    public Boolean isContentRestricted(ContentEntityObject content, List<String> userPermissionGroups) {
-        //before anything, check if the content is in a restricted space
-        SpaceContentEntityObject spaceContent = (SpaceContentEntityObject) content;
-        Space space = spaceContent.getSpace();
-        if(isSpaceRestricted(space, userPermissionGroups)){
-            return true;
-        }
-        //if not, check if the content itself is restricted, or has inherited any restrictions
-        List<ContentPermissionSet> contentPermissionSets = contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION);
-        for(ContentPermissionSet set : contentPermissionSets) {
-            for(ContentPermission permission : set) {
-                String groupName = permission.getGroupName();
-                System.out.println("--------++++++++======== GROUP : "+groupName+" ========++++++++--------");
-                if(groupName == null) {
-                    System.out.println("--------++++++++======== SKIPPING NULL GROUP ========++++++++--------");
-                    continue;
-                }
-                if(!userPermissionGroups.contains(groupName)){
-                    return true;
-                } 
-            }
-        }
-        return false;
-    }
-    public Boolean isSpaceRestricted(Space space, List<String> userPermissionGroups){
-        System.out.println("--------++++++++======== COMPARING SPACE "+space.getName()+" ========++++++++--------");
+    // public Boolean isContentRestricted(ContentEntityObject content, List<String> userPermissionGroups) {
+    //     //before anything, check if the content is in a restricted space
+    //     SpaceContentEntityObject spaceContent = (SpaceContentEntityObject) content;
+    //     Space space = spaceContent.getSpace();
+    //     if(isSpaceRestricted(space, userPermissionGroups)){
+    //         return true;
+    //     }
+    //     //if not, check if the content itself is restricted, or has inherited any restrictions
+    //     List<ContentPermissionSet> contentPermissionSets = contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION);
+    //     for(ContentPermissionSet set : contentPermissionSets) {
+    //         for(ContentPermission permission : set) {
+    //             String groupName = permission.getGroupName();
+    //             System.out.println("--------++++++++======== GROUP : "+groupName+" ========++++++++--------");
+    //             if(groupName == null) {
+    //                 System.out.println("--------++++++++======== SKIPPING NULL GROUP ========++++++++--------");
+    //                 continue;
+    //             }
+    //             if(!userPermissionGroups.contains(groupName)){
+    //                 return true;
+    //             } 
+    //         }
+    //     }
+    //     return false;
+    // }
+    // public Boolean isSpaceRestricted(Space space, List<String> userPermissionGroups){
+    //     System.out.println("--------++++++++======== COMPARING SPACE "+space.getName()+" ========++++++++--------");
 
-        List<SpacePermission> spacePermissions = space.getPermissions();
-        for(SpacePermission permission : spacePermissions) {
-            if(permission.isGroupPermission() && permission.getType().equals("VIEWSPACE")) {
-                if(permission != null){
-                    System.out.println("--------++++++++======== COMPARING SPACE PERMISSION "+permission.getGroup()+" ========++++++++--------");
-                    if(!userPermissionGroups.contains(permission.getGroup())) {
-                        System.out.println("--------++++++++======== SPACE RESTRICTED TO USER ========++++++++--------");
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
+    //     List<SpacePermission> spacePermissions = space.getPermissions();
+    //     for(SpacePermission permission : spacePermissions) {
+    //         if(permission.isGroupPermission() && permission.getType().equals("VIEWSPACE")) {
+    //             if(permission != null){
+    //                 System.out.println("--------++++++++======== COMPARING SPACE PERMISSION "+permission.getGroup()+" ========++++++++--------");
+    //                 if(!userPermissionGroups.contains(permission.getGroup())) {
+    //                     System.out.println("--------++++++++======== SPACE RESTRICTED TO USER ========++++++++--------");
+    //                     return true;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     return false;
+    // }
 
     // Misc. Utilities
     public List<ContentEntityObject> getSpaceChildrenContent(ContentType type, Space space) {

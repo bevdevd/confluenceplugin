@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class Utilities {
     
-    private static final List<String> andPerms = Arrays.asList("rl2");
+    private static final List<String> andPerms = Arrays.asList("rl2", "rl1");
 
     Utilities(){}
 

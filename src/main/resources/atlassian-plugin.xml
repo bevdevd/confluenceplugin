@@ -20,6 +20,16 @@
     <context>plugin</context> 
   </web-resource>  
 
+  <xhtml-macro name="custompagetree" class="com.example.test.macro.CustomPageTreeMacro" key='custompagetree-macro'>
+    <description>
+      Custom Page tree, implementing custom permission logic
+    </description>
+    <category name="confluence-content"/>
+    <parameters>
+      <parameter name="Name" type="string" />
+    </parameters>
+  </xhtml-macro>
+
   <!-- <servlet-filter key="contentServletFilter" class="com.example.test.servlet.BlockContentServletFilter">
     <description> Block access to content that aren't pages</description> 
     <url-pattern>/*</url-pattern>  
