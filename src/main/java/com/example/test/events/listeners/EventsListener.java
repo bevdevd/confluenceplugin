@@ -156,8 +156,6 @@ public class EventsListener implements InitializingBean, DisposableBean {
 
         this.utilities = new Utilities(
             this.contentService,
-            this.contentPermissionManager,
-            this.userAccessor,
             this.pageService,
             this.blogPostService,
             this.spaceService

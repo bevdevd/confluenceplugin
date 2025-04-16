@@ -14,55 +14,33 @@
   <!-- add our web resources -->
   <web-resource key="plugin-resources" name="plugin Web Resources"> 
     <dependency>com.atlassian.auiplugin:ajs</dependency>  
-    <resource type="download" name="plugin.css" location="/css/plugin.css"/>  
+    <resource type="download" name="plugin.css" location="/css/plugin.css"/> 
+    <resource type="download" name="customPageTreeMacro.css" location="/css/customPageTreeMacro.css"/>
     <resource type="download" name="plugin.js" location="/js/plugin.js"/>  
+    <resource type="download" name="customPageTreeMacro.js" location="/js/customPageTreeMacro.js"/>  
     <resource type="download" name="images/" location="/images"/>  
     <context>plugin</context> 
   </web-resource>  
 
-  <xhtml-macro name="custompagetree" class="com.example.test.macro.CustomPageTreeMacro" key='custompagetree-macro'>
-    <description>
-      Custom Page tree, implementing custom permission logic
-    </description>
-    <category name="confluence-content"/>
-    <parameters>
-      <parameter name="Name" type="string" />
-    </parameters>
+  <xhtml-macro
+      name="custompagetree"
+      key="custompagetree"
+      class="com.example.test.macro.CustomPageTreeMacro">
+      <description>This macro renders a custom message</description>
+      <category name="confluence-content"/>
+      <parameters>
+        <parameter name="SpaceKey" type="string"/>
+      </parameters>
   </xhtml-macro>
 
-  <!-- <servlet-filter key="contentServletFilter" class="com.example.test.servlet.BlockContentServletFilter">
+  <servlet-filter key="contentServletFilter" class="com.example.test.security.servlet.BlockAccessServletFilter">
     <description> Block access to content that aren't pages</description> 
     <url-pattern>/*</url-pattern>  
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>INCLUDE</dispatcher>  
     <dispatcher>FORWARD</dispatcher>  
     <weight>0</weight>  
-  </servlet-filter> -->
+  </servlet-filter>
 
-  <!-- <servlet-filter key = "directViewFilter" class="com.plugins.permissions.DirectViewServletFilter">
-        <description> Direct View Servlet Filter </description>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>  
-        <dispatcher>INCLUDE</dispatcher>  
-        <dispatcher>FORWARD</dispatcher>  
-        <weight>0</weight>  
-    </servlet-filter>
 
-    <servlet-filter key = "userPermissionsChangedServletFilter" class="com.plugins.permissions.UserPermissionsChangedServletFilter">
-        <description> User Permissions Changed Servlet Filter </description>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>  
-        <dispatcher>INCLUDE</dispatcher>  
-        <dispatcher>FORWARD</dispatcher>  
-        <weight>0</weight>  
-    </servlet-filter>
-
-    <servlet-filter key = "userCreatesServletFilter" class="com.plugins.permissions.UserCreatesServletFilter">
-        <description> User Creates Entity Servlet Filter </description>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>  
-        <dispatcher>INCLUDE</dispatcher>  
-        <dispatcher>FORWARD</dispatcher>  
-        <weight>0</weight>  
-    </servlet-filter> -->
 </atlassian-plugin>
