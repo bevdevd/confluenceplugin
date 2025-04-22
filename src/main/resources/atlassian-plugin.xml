@@ -42,5 +42,14 @@
     <weight>0</weight>  
   </servlet-filter>
 
+  <servlet-filter key="searchServletFiletr" class="com.example.test.security.servlet.RestrictSearchesServletFilter">
+    <description> Filter restricted content from searches </description> 
+    <url-pattern>/*</url-pattern>  
+    <dispatcher>REQUEST</dispatcher>  
+    <dispatcher>INCLUDE</dispatcher>  
+    <dispatcher>FORWARD</dispatcher>  
+    <weight>0</weight>  
+  </servlet-filter>
+
 
 </atlassian-plugin>
