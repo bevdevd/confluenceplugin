@@ -19,39 +19,34 @@
     <context>plugin</context> 
   </web-resource>  
 
-  <servlet-filter key="contentServletFilter" class="com.example.test.servlet.BlockContentServletFilter">
-    <description> Block access to content that aren't pages</description> 
-    <url-pattern>/*</url-pattern>  
-    <dispatcher>REQUEST</dispatcher>  
-    <dispatcher>INCLUDE</dispatcher>  
-    <dispatcher>FORWARD</dispatcher>  
-    <weight>0</weight>  
-  </servlet-filter>
+  <velocity-context-item key="SpaceRestrictionVelocityContext"
+          name="My Plugin's Velocity Helper" context-key="myVelocityHelper"
+          class="com.example.test.SpaceRestrictionVelocityContext"
+          global="true" />
 
-  <!-- <servlet-filter key = "directViewFilter" class="com.plugins.permissions.DirectViewServletFilter">
-        <description> Direct View Servlet Filter </description>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>  
-        <dispatcher>INCLUDE</dispatcher>  
-        <dispatcher>FORWARD</dispatcher>  
-        <weight>0</weight>  
-    </servlet-filter>
 
-    <servlet-filter key = "userPermissionsChangedServletFilter" class="com.plugins.permissions.UserPermissionsChangedServletFilter">
-        <description> User Permissions Changed Servlet Filter </description>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>  
-        <dispatcher>INCLUDE</dispatcher>  
-        <dispatcher>FORWARD</dispatcher>  
-        <weight>0</weight>  
-    </servlet-filter>
+  <web-panel key="sitePaaanel" location="atl.editor.savebar">
+      <resource name="view" type="velocity" location="header.vm"></resource>
+      <label key="hello.world.panel.label">Hello Panel</label>
+      <description key="hello.world.panel.desc">A not so simple panel</description>
+      <context-provider class="com.example.test.SpaceRestrictionVelocityContext"/>
+  </web-panel>
 
-    <servlet-filter key = "userCreatesServletFilter" class="com.plugins.permissions.UserCreatesServletFilter">
-        <description> User Creates Entity Servlet Filter </description>
-        <url-pattern>/*</url-pattern>
-        <dispatcher>REQUEST</dispatcher>  
-        <dispatcher>INCLUDE</dispatcher>  
-        <dispatcher>FORWARD</dispatcher>  
-        <weight>0</weight>  
-    </servlet-filter> -->
+  <!-- <web-panel key="sitePaasssanel" location="atl.footer">
+      <resource name="view" type="velocity" location="header.vm"></resource>
+      <label key="hello.world.panel.label">Hello Panel</label>
+      <description key="hello.world.panel.desc">A not so simple panel</description>
+      <context-provider class="com.example.test.SpaceRestrictionVelocityContext"/>
+  </web-panel>
+  <web-panel key="sit222ePanel" location="atl.dashboard.secondary">
+      <resource name="view" type="velocity" location="header.vm"></resource>
+      <label key="hello.world.panel.label">Hello Panel</label>
+      <description key="hello.world.panel.desc">A not so simple panel</description>
+      <context-provider class="com.example.test.SpaceRestrictionVelocityContext"/>
+  </web-panel>
+  <web-panel key="pagePanel" location="atl.page.metadata.banner">
+      <resource name="view" type="velocity" location="header.vm"></resource>
+      <context-provider class="com.example.test.SpaceRestrictionVelocityContext"/>
+  </web-panel> -->
+
 </atlassian-plugin>
