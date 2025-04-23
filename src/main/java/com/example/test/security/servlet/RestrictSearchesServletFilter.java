@@ -28,6 +28,7 @@ import com.google.gson.JsonObject;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.Arrays;
 import java.util.Map;
 
 import java.io.PrintWriter;
@@ -58,6 +59,7 @@ public class RestrictSearchesServletFilter implements Filter{
     private final SpaceManager spaceManager;
 
     private FilterConfig config;
+    // private final String prefix = "/confluence";
 
     public RestrictSearchesServletFilter (
         ContentService contentService,
@@ -95,124 +97,25 @@ public class RestrictSearchesServletFilter implements Filter{
 
         try {
             if (
+                uri.contains("dosearchsite.action")
+            ) {
+                Map<String,String[]> paramMap =  request.getParameterMap();
+                String modifiedResponseContent;
+                if (paramMap.containsKey("cql")) {
+                    // Don't let the query occur by the http request header, rely on the rest api (cqlSearch at /confluence/rest/searchv3/1.0/cqlSearch)
+                    System.out.println(Arrays.toString(paramMap.get("cql")));
+                    String newLocation = "/confluence/dosearchsite.action";
+                    httpResponse.sendRedirect(newLocation);
+                } else {
+                    System.out.println("no cql found");
+                }
+            }
+
+            if (
                 uri.contains("rest/api/search") ||
                 uri.contains("rest/searchv3/1.0/cqlSearch")
             ) {
-
-                ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(httpResponse);
-
-                chain.doFilter(request, responseWrapper);
-
-                byte[] responseArray = responseWrapper.getContentAsByteArray();
-                String responseStr = new String(responseWrapper.getContentAsByteArray(), responseWrapper.getCharacterEncoding());
-
-                // BELOW IS FOR DEBUG PURPOSES
-                // System.out.println("=======================================================================================");
-                // System.out.println("|                                         URI                                         |");
-                // System.out.println("=======================================================================================");
-                // System.out.println();
-                // System.out.println(uri);
-                // System.out.println();
-                // System.out.println("REPONSE INFO");
-                // System.out.println();
-
-                // System.out.println(httpResponse.toString());
-                // for(String name : responseWrapper.getHeaderNames()) {
-                //     System.out.println(name + " : " + responseWrapper.getHeader(name));
-                // }
-                // System.out.println(responseArray);
-                // System.out.println(responseWrapper.getCharacterEncoding());
-                // System.out.println(responseStr);
-                
-                // System.out.println("=======================================================================================");
-                // System.out.println("|                                      END OF URI                                     |");
-                // System.out.println("=======================================================================================");
-
-                PrintWriter writer = responseWrapper.getWriter();
-
-                int resultsCount = 0;
-                System.out.println("+++++++++++++++++++ api search +++++++++++++++++++++++++");
-                JsonParser jsonParser = new JsonParser();
-                JsonElement jsonElement = jsonParser.parse(responseStr);
-                System.out.println(jsonElement.toString());
-                JsonObject originalResponse = jsonElement.getAsJsonObject();
-                JsonObject modifiedResponse = new JsonObject();
-                
-                Set<Map.Entry<String,JsonElement>> originalParameters = originalResponse.entrySet();
-                for (Map.Entry<String,JsonElement> entry : originalParameters) {
-                    JsonElement value = entry.getValue();
-                    if (entry.getKey().equals("results")) {
-                        System.out.println("key is results");
-                        JsonArray results = entry.getValue().getAsJsonArray();
-                        JsonArray resultsArray = new JsonArray();
-                        for (JsonElement result : results) {
-                            // This is either a Page result or a Space result
-                            JsonObject resultObject = result.getAsJsonObject();
-                            JsonObject contentObject;
-                            //Check for Page result
-                            if (resultObject.has("content")) {
-                                contentObject = resultObject.getAsJsonObject("content");
-                                if (contentObject.has("id")) {
-                                    int id = contentObject.getAsJsonPrimitive("id").getAsInt();
-                                    Page page = pageService.getIdPageLocator(new Long(id)).getPage();
-                                    System.out.println("id is " + id);
-                                    if (
-                                        !Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") ||
-                                        !Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
-                                    ) {
-                                        continue;
-                                    }
-                                }
-                            } else if (resultObject.has("space")) {
-                                // the sidebar search will contain the id which we can easily use to find the Space object
-                                contentObject = resultObject.getAsJsonObject("space");
-                                if (contentObject.has("id")) {
-                                    int id = contentObject.getAsJsonPrimitive("id").getAsInt();
-                                    Space foundSpace = spaceManager.getSpace(id);
-                                    System.out.println("id is " + id);
-                                    if (Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")) {
-                                        continue;
-                                    }
-                                }
-                            } else if (resultObject.has("entityType")) {
-                                System.out.println("entityType is============================================================================= ");
-                                String entityType = resultObject.getAsJsonPrimitive("entityType").getAsString();
-                                System.out.println("entityType is " + entityType);
-                                if (entityType.equals("space")) {
-                                    String url = resultObject.getAsJsonPrimitive("url").getAsString();
-                                    String resultSpaceKey = url.split("/display/")[1];
-                                    System.out.println("spacekey is " + resultSpaceKey);
-                                    Space foundSpace = spaceManager.getSpace(resultSpaceKey);
-                                    if (
-                                        Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")
-                                    ) {
-                                        continue;
-                                    }
-                                }
-                            }
-                            resultsCount++;
-                            resultsArray.add(result);
-                            System.out.println("ADDED space TI RESULTS ARRAY ");
-                        }
-                        value = resultsArray;
-                        
-                        System.out.println("SET THE RESULTS ARAY    ");
-                    }
-                    // should probably change the total number of results returned
-                    else if (entry.getKey().equals("size") || entry.getKey().equals("totalSize") ) {
-                        int newSize = resultsCount; //entry.getValue().getAsInt() - resultsCount;
-                        value = new JsonPrimitive(newSize);
-                    }
-                    System.out.println("adding to modified response");
-                    // add the other parameters
-                    modifiedResponse.add(entry.getKey(), value);
-                }
-                System.out.println("modified perms are:");
-                responseWrapper.reset();
-                System.out.println(modifiedResponse.toString());
-                writer.write(modifiedResponse.toString());
-                writer.flush();
-                responseWrapper.copyBodyToResponse();
+                this.filterSearchResults(request, httpResponse, chain, loggedInUser);
             } else {
                 chain.doFilter(request, response);
             }
@@ -221,5 +124,102 @@ public class RestrictSearchesServletFilter implements Filter{
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             chain.doFilter(request, response);
         }
+    }
+
+    private void filterSearchResults(
+        ServletRequest request,
+        HttpServletResponse httpResponse,
+        FilterChain chain,
+        ConfluenceUser loggedInUser
+    ) throws IOException, ServletException {
+        ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(httpResponse);
+
+        chain.doFilter(request, responseWrapper);
+        byte[] responseArray = responseWrapper.getContentAsByteArray();
+        String responseStr = new String(responseWrapper.getContentAsByteArray(), responseWrapper.getCharacterEncoding());
+        PrintWriter writer = responseWrapper.getWriter();
+        int resultsCount = 0;
+        System.out.println("+++++++++++++++++++ api search +++++++++++++++++++++++++");
+        JsonParser jsonParser = new JsonParser();
+        JsonElement jsonElement = jsonParser.parse(responseStr);
+        System.out.println(jsonElement.toString());
+        JsonObject originalResponse = jsonElement.getAsJsonObject();
+        JsonObject modifiedResponse = new JsonObject();
+        
+        Set<Map.Entry<String,JsonElement>> originalParameters = originalResponse.entrySet();
+        for (Map.Entry<String,JsonElement> entry : originalParameters) {
+            JsonElement value = entry.getValue();
+            if (entry.getKey().equals("results")) {
+                System.out.println("key is results");
+                JsonArray results = entry.getValue().getAsJsonArray();
+                JsonArray resultsArray = new JsonArray();
+                for (JsonElement result : results) {
+                    // This is either a Page result or a Space result
+                    JsonObject resultObject = result.getAsJsonObject();
+                    JsonObject contentObject;
+                    //Check for Page result
+                    if (resultObject.has("content")) {
+                        contentObject = resultObject.getAsJsonObject("content");
+                        if (contentObject.has("id")) {
+                            int id = contentObject.getAsJsonPrimitive("id").getAsInt();
+                            Page page = pageService.getIdPageLocator(new Long(id)).getPage();
+                            System.out.println("id is " + id);
+                            if (
+                                !Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") ||
+                                !Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
+                            ) {
+                                continue;
+                            }
+                        }
+                    } else if (resultObject.has("space")) {
+                        // the sidebar search will contain the id which we can easily use to find the Space object
+                        contentObject = resultObject.getAsJsonObject("space");
+                        if (contentObject.has("id")) {
+                            int id = contentObject.getAsJsonPrimitive("id").getAsInt();
+                            Space foundSpace = spaceManager.getSpace(id);
+                            System.out.println("id is " + id);
+                            if (Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")) {
+                                continue;
+                            }
+                        }
+                    } else if (resultObject.has("entityType")) {
+                        System.out.println("entityType is============================================================================= ");
+                        String entityType = resultObject.getAsJsonPrimitive("entityType").getAsString();
+                        System.out.println("entityType is " + entityType);
+                        if (entityType.equals("space")) {
+                            String url = resultObject.getAsJsonPrimitive("url").getAsString();
+                            String resultSpaceKey = url.split("/display/")[1];
+                            System.out.println("spacekey is " + resultSpaceKey);
+                            Space foundSpace = spaceManager.getSpace(resultSpaceKey);
+                            if (
+                                Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")
+                            ) {
+                                continue;
+                            }
+                        }
+                    }
+                    resultsCount++;
+                    resultsArray.add(result);
+                    System.out.println("ADDED space TI RESULTS ARRAY ");
+                }
+                value = resultsArray;
+                
+                System.out.println("SET THE RESULTS ARAY    ");
+            }
+            // should probably change the total number of results returned
+            else if (entry.getKey().equals("size") || entry.getKey().equals("totalSize") ) {
+                int newSize = resultsCount; //entry.getValue().getAsInt() - resultsCount;
+                value = new JsonPrimitive(newSize);
+            }
+            System.out.println("adding to modified response");
+            // add the other parameters
+            modifiedResponse.add(entry.getKey(), value);
+        }
+        System.out.println("modified perms are:");
+        responseWrapper.reset();
+        System.out.println(modifiedResponse.toString());
+        writer.write(modifiedResponse.toString());
+        writer.flush();
+        responseWrapper.copyBodyToResponse();
     }
 }
