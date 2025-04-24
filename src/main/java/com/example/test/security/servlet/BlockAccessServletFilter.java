@@ -134,19 +134,21 @@ public class BlockAccessServletFilter implements Filter{
 
         try {
             // Below for debugging
-            // System.out.println("=======================================================================================");
-            // System.out.println("|                                         URI                                         |");
-            // System.out.println("=======================================================================================");
-            // System.out.println();
-            // System.out.println(uri);
-            // System.out.println();
-            // System.out.println("=======================================================================================");
-            // System.out.println("|                                      END OF URI                                     |");
-            // System.out.println("=======================================================================================");
+            System.out.println("=======================================================================================");
+            System.out.println("|                                         URI                                         |");
+            System.out.println("=======================================================================================");
+            System.out.println();
+            System.out.println(uri);
+            System.out.println();
+            System.out.println("=======================================================================================");
+            System.out.println("|                                      END OF URI                                     |");
+            System.out.println("=======================================================================================");
+
+            //http://localhost:1990/confluence/pages/viewpage.action?pageId=2228231
 
             for(String blockedUri : blockedUris) {
                 if(uri.contains(blockedUri)) {
-                    httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
             }
             if(
@@ -156,15 +158,17 @@ public class BlockAccessServletFilter implements Filter{
                     Content content = contentService.find().withId(ContentId.of(Long.parseLong(request.getParameter("pageId")))).fetch().get();
                     if(content.getType().getType().equals("blogpost")) {
                         /* DEBUG */System.out.println("--------++++++++======== USER ATTEMPTED TO ACCESS A RESTRICTED FEATURE ========++++++++--------");
-                        httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND);
+                        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
                     }
                 }
             }
-            chain.doFilter(request, httpResponse);
+
+            chain.doFilter(request, response);
         } catch (Exception e) {
             System.out.println("unfortunately, we have errored: " + e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            chain.doFilter(request, httpResponse);
+            chain.doFilter(request, response);
         }
+
     }
 }
