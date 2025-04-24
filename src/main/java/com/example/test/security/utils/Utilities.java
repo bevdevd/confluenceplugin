@@ -25,6 +25,7 @@ public class Utilities {
 
    // I was incredibly silly when I wrote this, and accidentally inverted all the checks,
    // so if is<blank>Restricted(...) returns false, the entity is in fact restricted, contrary to how that sounds
+   // These methods used to be is<blank>Permitted which is how this mistake occured, changing it now would require a full refactor
 
    public static boolean isSpaceRestricted(Space space, User user, UserAccessor userAccessor, String Type){
        List<SpacePermission> spacePermissions = space.getPermissions();

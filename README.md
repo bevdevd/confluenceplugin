@@ -29,3 +29,14 @@ https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugi
     - againe replacing <plugin file name> with the full file name from step 1
 6. in confluence's install files, removing the original email notifications plugin, and replace it with the one from the working directory
 7. restart Confluence
+
+## Adding the Page Tree Macro to Confluence's Side Bar
+1. Make sure to disable ALL side bar features on every space
+2. create a user macro, name it anything relevant (pagetreeinsert and Page Tree Insert for Macro name and title respectively, or something to that effect)
+3. insert the following HTML into the user macro to insert the page tree, you can add anything else you might like (space name, links to important features, etc.) here as well
+``` html
+<ac:structured-macro ac:name="custompagetree" ac:schema-version="1"">
+    <ac:parameter ac:name="SpaceKey">$space.key</ac:parameter>
+</ac:structured-macro>
+```
+4. In the look and feel settings, add the user macro you just created in the sidebar field (use wiki-markup for this, using the Macro Name you created in step 2, for example: {pagetreeinsert})

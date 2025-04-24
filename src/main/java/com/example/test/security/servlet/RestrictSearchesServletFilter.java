@@ -178,7 +178,9 @@ public class RestrictSearchesServletFilter implements Filter{
                             int id = contentObject.getAsJsonPrimitive("id").getAsInt();
                             Space foundSpace = spaceManager.getSpace(id);
                             System.out.println("id is " + id);
-                            if (Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")) {
+                            if (
+                                !Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")
+                            ) {
                                 continue;
                             }
                         }
@@ -192,7 +194,7 @@ public class RestrictSearchesServletFilter implements Filter{
                             System.out.println("spacekey is " + resultSpaceKey);
                             Space foundSpace = spaceManager.getSpace(resultSpaceKey);
                             if (
-                                Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")
+                                !Utilities.isSpaceRestricted(foundSpace, loggedInUser, this.userAccessor, "VIEWSPACE")
                             ) {
                                 continue;
                             }

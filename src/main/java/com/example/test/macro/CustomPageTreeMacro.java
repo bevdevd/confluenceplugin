@@ -54,13 +54,18 @@ public class CustomPageTreeMacro implements Macro {
 
         ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
 
+        String pageTreeHtml = "<div>";
+
         if(
             !(space == null)
         ) {
-            return getPageList(space, loggedInUser);
+            pageTreeHtml += getPageList(space, loggedInUser);
         } else {
-            return "<h3>Page tree is unavailable in this context</h3><br/><p>please open a space or a page for further navigation.</p>";
+            pageTreeHtml +=  "<h3>Page tree is unavailable in this context</h3><br/><p>please open a space or a page for further navigation.</p>";
         }
+        pageTreeHtml += "</div>";
+
+        return pageTreeHtml;
     }
 
     @Override
@@ -76,9 +81,9 @@ public class CustomPageTreeMacro implements Macro {
     private String getPageList(Space space, ConfluenceUser user){
         List<Page> topLevelPages = this.pageManager.getTopLevelPages(space);
         if(topLevelPages == null) {
-            return "Page list is empty?";
+            return "<p>No pages to display, get started by creating one.</p>";
         }
-        return /* DEBUG "<h3>welcome "+user.getFullName()+"</h3><h4>You are in Space: "+space.getName()+"</h4></br>"+/* DEBUG */getPageList(topLevelPages, user, true, null);
+        return getPageList(topLevelPages, user, true, null);
     }
 
     private String getPageList(List<Page> pageList, ConfluenceUser user, Boolean topLevel, String id) {
@@ -103,7 +108,7 @@ public class CustomPageTreeMacro implements Macro {
             String pageId = Long.toString(page.getContentId().asLong());
             if(Utilities.isContentRestricted((ContentEntityObject) page, user, this.userAccessor, ContentPermission.VIEW_PERMISSION)) {
                 if(page.hasChildren()){
-                    htmlPageList += "<li><span class='collapsible' id=button_"+pageId+" onClick='hide(this, "+pageId+")'>+ </span><a href='/confluence/pages/viewpage.action?pageId="+pageId+"'>"+page.getTitle()+"</a>";
+                    htmlPageList += "<li class='macroListItem'><span class='collapsible' id=button_"+pageId+" onClick='hide(this, "+pageId+")'>+ </span><a href='/confluence/pages/viewpage.action?pageId="+pageId+"'>"+page.getTitle()+"</a>";
                     htmlPageList += getPageList(page.getChildren(), user, false, pageId);
                 } else {
                     htmlPageList += "<li>• <a href='/confluence/pages/viewpage.action?pageId="+pageId+"'>"+page.getTitle()+"</a>";
