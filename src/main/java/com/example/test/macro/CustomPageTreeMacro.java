@@ -106,7 +106,10 @@ public class CustomPageTreeMacro implements Macro {
 
         for(Page page : pageList) {
             String pageId = Long.toString(page.getContentId().asLong());
-            if(Utilities.isContentRestricted((ContentEntityObject) page, user, this.userAccessor, ContentPermission.VIEW_PERMISSION)) {
+            if(
+                Utilities.isSpaceRestricted(page.getSpace(), user, this.userAccessor, "VIEWSPACE") &&
+                Utilities.isContentRestricted((ContentEntityObject) page, user, this.userAccessor, ContentPermission.VIEW_PERMISSION)
+            ) {
                 if(page.hasChildren()){
                     htmlPageList += "<li class='macroListItem'><span class='collapsible' id=button_"+pageId+" onClick='hide(this, "+pageId+")'>+ </span><a href='/confluence/pages/viewpage.action?pageId="+pageId+"'>"+page.getTitle()+"</a>";
                     htmlPageList += getPageList(page.getChildren(), user, false, pageId);
