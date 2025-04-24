@@ -3,6 +3,7 @@ package com.example.test.security.utils;
 import com.atlassian.confluence.core.ContentEntityObject;
 import com.atlassian.confluence.security.ContentPermissionSet;
 import com.atlassian.confluence.security.ContentPermission;
+import com.atlassian.confluence.core.ContentPermissionManager;
 
 import com.atlassian.confluence.pages.Page;
 
@@ -14,14 +15,25 @@ import com.atlassian.user.User;
 
 import com.atlassian.confluence.security.delegate.PagePermissionsDelegate;
 
+import com.atlassian.sal.api.component.ComponentLocator;
+
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Arrays;
 
 public class Utilities {
     
    private static final List<String> andPerms = Arrays.asList("rl2", "rl1");
-   Utilities(){}
+
+   // @ComponentImport
+   // private static final ContentPermissionManager contentPermissionManager;
+
+   Utilities(
+      // ContentPermissionManager contentPermissionManager
+   ){
+      // this.contentPermissionManager = contentPermissionManager;
+   }
 
    // I was incredibly silly when I wrote this, and accidentally inverted all the checks,
    // so if is<blank>Restricted(...) returns false, the entity is in fact restricted, contrary to how that sounds
@@ -59,8 +71,18 @@ public class Utilities {
    }
    public static boolean isContentRestricted(ContentEntityObject content, User user, UserAccessor userAccessor, String type) {
        boolean userPermitted = false;
-       if(content.hasPermissions(type)) {
-           for(ContentPermission permission : content.getContentPermissionSet(type)) {
+
+      ContentPermissionManager contentPermissionManager = ComponentLocator.getComponent(ContentPermissionManager.class);
+
+       List<ContentPermission> contentPermissionsList = new ArrayList<>();
+       for(ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, type)) {
+         for(ContentPermission permission : set) {
+            contentPermissionsList.add(permission);
+         }
+       }
+
+       if(!contentPermissionsList.isEmpty()) {
+           for(ContentPermission permission : contentPermissionsList) {
               if(permission.isGroupPermission()) {
                  if(!userAccessor.getGroupNamesForUserName(user.getName()).contains(permission.getGroupName())) {
                    //if the user isn't a member of any one of the groups attached to the content, check if it's one of the AND permissions
