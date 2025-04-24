@@ -26,7 +26,7 @@ https://developer.atlassian.com/display/DOCS/Introduction+to+the+Atlassian+Plugi
     ``` bash
     jar uvf <plugin file name> templates
     ```
-    - againe replacing <plugin file name> with the full file name from step 1
+    - again replacing <plugin file name> with the full file name from step 1
 6. in confluence's install files, removing the original email notifications plugin, and replace it with the one from the working directory
 7. restart Confluence
 

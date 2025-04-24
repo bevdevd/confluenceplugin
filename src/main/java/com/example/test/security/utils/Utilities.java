@@ -26,14 +26,7 @@ public class Utilities {
     
    private static final List<String> andPerms = Arrays.asList("rl2", "rl1");
 
-   // @ComponentImport
-   // private static final ContentPermissionManager contentPermissionManager;
-
-   Utilities(
-      // ContentPermissionManager contentPermissionManager
-   ){
-      // this.contentPermissionManager = contentPermissionManager;
-   }
+   Utilities(){}
 
    // I was incredibly silly when I wrote this, and accidentally inverted all the checks,
    // so if is<blank>Restricted(...) returns false, the entity is in fact restricted, contrary to how that sounds
