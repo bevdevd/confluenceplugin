@@ -20,7 +20,7 @@
     <resource type="download" name="customPageTreeMacro.js" location="/js/customPageTreeMacro.js"/>  
     <resource type="download" name="images/" location="/images"/>  
     <context>plugin</context> 
-  </web-resource>  
+  </web-resource> 
 
   <xhtml-macro
       name="custompagetree"
@@ -42,14 +42,32 @@
     <weight>0</weight>  
   </servlet-filter>
 
-  <servlet-filter key="searchServletFiletr" class="com.example.test.security.servlet.RestrictSearchesServletFilter">
+  <servlet-filter key="searchServletFilter" class="com.example.test.security.servlet.BasicSearchServletFilter">
     <description> Filter restricted content from searches </description> 
-    <url-pattern>/*</url-pattern>  
+    <url-pattern>/rest/api/search</url-pattern>
+    <url-pattern>/rest/searchv3/1.0/cqlSearch</url-pattern>
+    <dispatcher>REQUEST</dispatcher>  
+    <dispatcher>INCLUDE</dispatcher>  
+    <dispatcher>FORWARD</dispatcher>  
+    <weight>0</weight>  
+  </servlet-filter>
+  
+  <servlet-filter key="advancedSearchServletFilter" class="com.example.test.security.servlet.AdvancedSearchServletFilter">
+    <description> Filter restricted content from searches </description> 
+    <url-pattern>/dosearchsite.action</url-pattern>  
     <dispatcher>REQUEST</dispatcher>  
     <dispatcher>INCLUDE</dispatcher>  
     <dispatcher>FORWARD</dispatcher>  
     <weight>0</weight>  
   </servlet-filter>
 
+  <servlet-filter key="allUpdatesServletFilter" class="com.example.test.security.servlet.AllUpdatesMacroServletFilter">
+    <description> Filter restricted content from All Updates dashboard</description> 
+    <url-pattern>/rest/dashboardmacros/1.0/updates</url-pattern>  
+    <dispatcher>REQUEST</dispatcher>  
+    <dispatcher>INCLUDE</dispatcher>  
+    <dispatcher>FORWARD</dispatcher>  
+    <weight>0</weight>  
+  </servlet-filter>
 
 </atlassian-plugin>
