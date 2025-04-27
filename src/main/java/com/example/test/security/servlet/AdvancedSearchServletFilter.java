@@ -46,7 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.inject.Named;
 
 @Named
-public class RestrictSearchesServletFilter implements Filter{
+public class AdvancedSearchServletFilter implements Filter{
     @ConfluenceImport
     private ContentService contentService;
     @ComponentImport
@@ -59,9 +59,8 @@ public class RestrictSearchesServletFilter implements Filter{
     private final SpaceManager spaceManager;
 
     private FilterConfig config;
-    // private final String prefix = "/confluence";
 
-    public RestrictSearchesServletFilter (
+    public AdvancedSearchServletFilter (
         ContentService contentService,
         UserAccessor userAccessor,
         PageService pageService,
@@ -94,36 +93,28 @@ public class RestrictSearchesServletFilter implements Filter{
         String uri = httpRequest.getRequestURI();
         
         ConfluenceUser loggedInUser = AuthenticatedUserThreadLocal.get();
+        System.out.println("IN ADVANCED SEARCH");
 
         try {
-            if (
-                uri.contains("dosearchsite.action")
-            ) {
-                Map<String,String[]> paramMap =  request.getParameterMap();
-                String modifiedResponseContent;
-                if (paramMap.containsKey("cql")) {
-                    // Don't let the query occur by the http request header, rely on the rest api (cqlSearch at /confluence/rest/searchv3/1.0/cqlSearch)
-                    System.out.println(Arrays.toString(paramMap.get("cql")));
-                    String newLocation = "/confluence/dosearchsite.action";
-                    httpResponse.sendRedirect(newLocation);
-                } else {
-                    System.out.println("no cql found");
-                }
-            }
+            Map<String,String[]> paramMap =  request.getParameterMap();
+            String modifiedResponseContent;
 
-            if (
-                uri.contains("rest/api/search") ||
-                uri.contains("rest/searchv3/1.0/cqlSearch")
-            ) {
-                this.filterSearchResults(request, httpResponse, chain, loggedInUser);
+            // Don't let the query occur by the http request header, rely on the rest api (cqlSearch at /confluence/rest/searchv3/1.0/cqlSearch)
+            // If done this way, the search will be done using internal checks
+            // Here we force a redirect to an empty advanced search session
+            if (paramMap.containsKey("cql")) {
+                System.out.println(Arrays.toString(paramMap.get("cql")));
+                String newLocation = "/confluence/dosearchsite.action";
+                httpResponse.sendRedirect(newLocation);
             } else {
-                chain.doFilter(request, response);
+                System.out.println("no cql found");
             }
         } catch (Exception e) {
             System.out.println("unfortunately, we have errored: " + e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            chain.doFilter(request, response);
         }
+
+        chain.doFilter(request, response);
     }
 
     private void filterSearchResults(

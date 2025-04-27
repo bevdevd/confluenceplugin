@@ -65,13 +65,11 @@ import java.lang.ThreadLocal;
 import java.util.Map;
 import java.util.Arrays;
 
-
 /* 
- * Blocks access to restricted features such as Space Calendars, personal Calendars
+ * Blocks access to Viewing Blogs
  */
-
 @Named
-public class BlockAccessServletFilter implements Filter{
+public class BlockBlogsServletFilter implements Filter{
     @ConfluenceImport
     private ContentService contentService;
     @ComponentImport
@@ -89,20 +87,9 @@ public class BlockAccessServletFilter implements Filter{
 
     private FilterConfig config;
 
-    private static final List<String> blockedUris = Arrays.asList(
-        "spacecalendar.action",
-        "calendarpage.action",
-        "mycalendar.action",
-        "viewrecentblogposts.action",
-        "editblogpost.action",
-        "pages.action",
-        "reorderaction.action",
-        "listattachmentsforspace.action",
-        "exportspacewelcome.action"
-        );
 
     @Inject
-    public BlockAccessServletFilter (
+    public BlockBlogsServletFilter (
         ContentService contentService,
         ContentPermissionManager contentPermissionManager,
         UserAccessor userAccessor,
@@ -140,7 +127,7 @@ public class BlockAccessServletFilter implements Filter{
         try {
             // Below for debugging
             System.out.println("=======================================================================================");
-            System.out.println("|                                         URI                                         |");
+            System.out.println("|                                  VIEWPAGE ACTION                                     |");
             System.out.println("=======================================================================================");
             System.out.println();
             System.out.println(uri);
@@ -151,11 +138,6 @@ public class BlockAccessServletFilter implements Filter{
 
             //http://localhost:1990/confluence/pages/viewpage.action?pageId=2228231
 
-            for(String blockedUri : blockedUris) {
-                if(uri.contains(blockedUri)) {
-                    httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
-                }
-            }
             if(
                 uri.contains("viewpage.action")
             ){  // View blog posts themselves is treated as viewing a page, use the pageId and content service to find the type of content to block blog posts

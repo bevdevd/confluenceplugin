@@ -6,6 +6,8 @@ import com.atlassian.confluence.security.ContentPermission;
 import com.atlassian.confluence.core.ContentPermissionManager;
 
 import com.atlassian.confluence.pages.Page;
+import com.atlassian.confluence.pages.Comment;
+import com.atlassian.confluence.pages.Attachment;
 
 import com.atlassian.confluence.spaces.Space;
 import com.atlassian.confluence.security.SpacePermission;
@@ -65,6 +67,7 @@ public class Utilities {
    public static boolean isContentRestricted(ContentEntityObject content, User user, UserAccessor userAccessor, String type) {
        boolean userPermitted = false;
 
+       System.out.println("Calling isContentRestricted with the following permissions:");
       ContentPermissionManager contentPermissionManager = ComponentLocator.getComponent(ContentPermissionManager.class);
 
        List<ContentPermission> contentPermissionsList = new ArrayList<>();
@@ -73,6 +76,7 @@ public class Utilities {
             contentPermissionsList.add(permission);
          }
        }
+       System.out.println(contentPermissionsList.toString());
 
        if(!contentPermissionsList.isEmpty()) {
            for(ContentPermission permission : contentPermissionsList) {
@@ -102,5 +106,37 @@ public class Utilities {
            System.out.println("========================================================================================================================");
        }
         return userPermitted;
+   }
+
+
+   // Gets the page that a piece of content (Comment, Attachment) belongs to
+   public static Page getParentPage(ContentEntityObject content) {
+      try {
+            if (content != null) {
+               if (content instanceof Page) {
+                  return (Page) content;
+               } else if (content instanceof Comment) {
+                  Comment comment = (Comment) content;
+                  ContentEntityObject container = comment.getContainer();
+                  while (container instanceof Comment) {
+                        container = ((Comment) container).getContainer();
+                  }
+                  if (container instanceof Page) {
+                        return (Page) container;
+                  }
+               } else if (content instanceof Attachment) {
+                  Attachment attachment = (Attachment) content;
+                  ContentEntityObject container = attachment.getContainer();
+                  if (container instanceof Page) {
+                        return (Page) container;
+                  }
+               }
+            }
+      } catch(Exception e) {
+            System.out.println("Error getting parent page : "+e);
+      }
+   
+      // If a parent page cannot be found, return null
+      return null;
    }
 }
