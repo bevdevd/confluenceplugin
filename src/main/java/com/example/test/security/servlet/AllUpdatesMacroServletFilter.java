@@ -156,8 +156,8 @@ public class AllUpdatesMacroServletFilter implements Filter{
                                     System.out.println("page  is " + page.toString());
 
                                     if (page != null && (   
-                                            !Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") &&
-                                            !Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
+                                            Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") &&
+                                            Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
                                             )
                                         ) {
                                         hasValidUpdates = true;
@@ -177,8 +177,8 @@ public class AllUpdatesMacroServletFilter implements Filter{
                                     Page page = pageService.getIdPageLocator(new Long(pageId)).getPage();
                                     System.out.println("page  is " + page.toString());
                                     if (page != null && (   
-                                        !Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") &&
-                                        !Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
+                                        Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") &&
+                                        Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
                                         )
                                     ) {
 
@@ -198,8 +198,8 @@ public class AllUpdatesMacroServletFilter implements Filter{
                                     System.out.println("page  is " + page.toString());
 
                                     if (page != null && (   
-                                        !Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") &&
-                                        !Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
+                                        Utilities.isSpaceRestricted(page.getSpace(), loggedInUser, this.userAccessor, "VIEWSPACE") &&
+                                        Utilities.isContentRestricted((ContentEntityObject) page, loggedInUser, this.userAccessor, ContentPermission.VIEW_PERMISSION)
                                         )
                                     ) {
                                         hasValidUpdates = true;
