@@ -126,15 +126,15 @@ public class BlockBlogsServletFilter implements Filter{
 
         try {
             // Below for debugging
-            System.out.println("=======================================================================================");
-            System.out.println("|                                  VIEWPAGE ACTION                                     |");
-            System.out.println("=======================================================================================");
-            System.out.println();
-            System.out.println(uri);
-            System.out.println();
-            System.out.println("=======================================================================================");
-            System.out.println("|                                      END OF URI                                     |");
-            System.out.println("=======================================================================================");
+            // System.out.println("=======================================================================================");
+            // System.out.println("|                                  VIEWPAGE ACTION                                     |");
+            // System.out.println("=======================================================================================");
+            // System.out.println();
+            // System.out.println(uri);
+            // System.out.println();
+            // System.out.println("=======================================================================================");
+            // System.out.println("|                                      END OF URI                                     |");
+            // System.out.println("=======================================================================================");
 
             //http://localhost:1990/confluence/pages/viewpage.action?pageId=2228231
 

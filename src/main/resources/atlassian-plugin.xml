@@ -51,7 +51,7 @@
     <dispatcher>FORWARD</dispatcher>  
     <weight>0</weight>  
   </servlet-filter>
-  
+
   <servlet-filter key="advancedSearchServletFilter" class="com.example.test.security.servlet.AdvancedSearchServletFilter">
     <description> Filter restricted content from searches </description> 
     <url-pattern>/dosearchsite.action</url-pattern>  
@@ -69,5 +69,30 @@
     <dispatcher>FORWARD</dispatcher>  
     <weight>0</weight>  
   </servlet-filter>
+
+
+  <velocity-context-item key="EditPageVelocityContext"
+          name="My Plugin's Velocity Helper" context-key="myVelocityHelper"
+          class="com.example.test.security.EditPageVelocityContext"
+          global="true" />
+  <velocity-context-item key="ViewPageVelocityContext"
+          name="My Plugin's Velocity Helper" context-key="myVelocityHelper"
+          class="com.example.test.security.ViewPageVelocityContext"
+          global="true" />
+
+
+  <web-panel key="editBanner" location="atl.editor.savebar">
+      <resource name="view" type="velocity" location="velocityTemplates/pageBanner.vm"></resource>
+      <label key="hello.world.panel.label">Hello Panel</label>
+      <description key="hello.world.panel.desc">A not so simple panel</description>
+      <context-provider class="com.example.test.security.EditPageVelocityContext"/>
+  </web-panel>
+
+  <web-panel key="pageBanner" location="atl.page.metadata.banner">
+      <resource name="view" type="velocity" location="velocityTemplates/pageBanner.vm"></resource>
+      <label key="hello.world.panel.label">Hello Panel</label>
+      <description key="hello.world.panel.desc">A not so simple panel</description>
+      <context-provider class="com.example.test.security.ViewPageVelocityContext"/>
+  </web-panel>
 
 </atlassian-plugin>

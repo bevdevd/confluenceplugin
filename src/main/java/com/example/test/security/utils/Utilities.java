@@ -20,6 +20,9 @@ import com.atlassian.confluence.security.delegate.PagePermissionsDelegate;
 import com.atlassian.sal.api.component.ComponentLocator;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Arrays;
@@ -108,30 +111,100 @@ public class Utilities {
         return userPermitted;
    }
 
+   
+   // Gets a list of mandatory restrictions present in a Space
+   public static List<String> getSpaceRestrictions(Space space) {
+
+      Set<String> restrictions = new HashSet<String>();
+      System.out.println("Viewspace permission is" + SpacePermission.VIEWSPACE_PERMISSION);
+      //default classification
+      restrictions.add("unrestricted");
+      List<SpacePermission> spacePermissions = space.getPermissions();
+      for(SpacePermission spacePermission : spacePermissions) {
+         if(spacePermission != null) {
+
+            if(spacePermission.isGroupPermission() && spacePermission.getType().equals(SpacePermission.VIEWSPACE_PERMISSION)) {
+               System.out.println(" permission is" + spacePermission.getGroup());
+               if(andPerms.contains(spacePermission.getGroup())) {
+                  
+                  restrictions.add(spacePermission.getGroup());
+               }
+            }
+         }
+      }
+      // if other restrictions are present, remove the default classification
+      if (restrictions.size() > 1) {
+         restrictions.remove("unrestricted");
+      }
+      System.out.println("space restrictions : " + restrictions);
+
+      return new ArrayList<String>(restrictions);
+   }
+
+   // Gets a list of mandatory restrictions present in the parental hierarchy of an object
+   public static List<String> getPageHierarchyRestrictions(ContentEntityObject content) {
+      System.out.println("Getting restrictions from content :" + content.toString() + " and its parents");
+
+      Set<String> restrictions = new HashSet<String>();
+      //default classification
+      restrictions.add("unrestricted");
+      try {
+         ContentEntityObject currentContent = content;
+         ContentPermissionManager contentPermissionManager = ComponentLocator.getComponent(ContentPermissionManager.class);
+         List<ContentPermission> contentPermissionsList = new ArrayList<>();
+         
+         for (ContentPermissionSet set : contentPermissionManager.getContentPermissionSets(content, ContentPermission.VIEW_PERMISSION)) {
+            System.out.println(currentContent.getLowerTitle() + " permissions: " + set.getGroupNames());
+            for (ContentPermission permission : set) {
+               // Mandatory permissions are only present in group permissions
+               if(permission.isGroupPermission()) {
+                  System.out.println(currentContent.getLowerTitle() + " permissions: " + permission.getGroupName());
+                  System.out.println(currentContent.getLowerTitle() + " permission: " + permission.toString());
+                  if (andPerms.contains(permission.getGroupName())) {
+                     restrictions.add(permission.getGroupName());
+                  }
+               }
+            }
+         }
+
+      } catch(Exception e) {
+            System.out.println("Error getting parent page : " + e);
+      }
+
+      // if other restrictions are present, remove the default classification
+      if (restrictions.size() > 1) {
+         restrictions.remove("unrestricted");
+      }
+      System.out.println("content restrictions : " + restrictions);
+
+      return new ArrayList<String>(restrictions);
+   }
+
+
 
    // Gets the page that a piece of content (Comment, Attachment) belongs to
    public static Page getParentPage(ContentEntityObject content) {
       try {
-            if (content != null) {
-               if (content instanceof Page) {
-                  return (Page) content;
-               } else if (content instanceof Comment) {
-                  Comment comment = (Comment) content;
-                  ContentEntityObject container = comment.getContainer();
-                  while (container instanceof Comment) {
-                        container = ((Comment) container).getContainer();
-                  }
-                  if (container instanceof Page) {
-                        return (Page) container;
-                  }
-               } else if (content instanceof Attachment) {
-                  Attachment attachment = (Attachment) content;
-                  ContentEntityObject container = attachment.getContainer();
-                  if (container instanceof Page) {
-                        return (Page) container;
-                  }
+         if (content != null) {
+            if (content instanceof Page) {
+               return (Page) content;
+            } else if (content instanceof Comment) {
+               Comment comment = (Comment) content;
+               ContentEntityObject container = comment.getContainer();
+               while (container instanceof Comment) {
+                     container = ((Comment) container).getContainer();
+               }
+               if (container instanceof Page) {
+                     return (Page) container;
+               }
+            } else if (content instanceof Attachment) {
+               Attachment attachment = (Attachment) content;
+               ContentEntityObject container = attachment.getContainer();
+               if (container instanceof Page) {
+                     return (Page) container;
                }
             }
+         }
       } catch(Exception e) {
             System.out.println("Error getting parent page : "+e);
       }
